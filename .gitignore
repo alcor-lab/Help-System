@@ -102,3 +102,8 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+model/activity_network_model-0.data-00000-of-00001
+model/activity_network_model-0.index
+model/activity_network_model-0.meta
+model/checkpoint
