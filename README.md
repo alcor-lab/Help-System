@@ -55,3 +55,21 @@ contains the list of preprocessed frame extracted from one second. the frames
 must be ordered such that the first frame must be the oldest and the last the
 newest. The list of those list must follow the same order with the first list
 containing the frame of the oldest second and the last the one of the newest
+
+```python
+now_softmax, next_softmax, help_softmax = helpnet.compute_activity_given_tensor(input_tensor, second_count)
+```
+
+returns the softmax for the now and next activity and the help action. It requires in iput the input tensor and the second count of the newest given second.
+
+```python
+now_softmax, next_softmax, help_softmax = helpnet.compute_activity_given_seconds_matrix(input_tensor, second_count)
+```
+return the outputs given the list of seconds matrix
+
+```python
+now_softmax, next_softmax, help_softmax = helpnet.compute_activity_given_frame_list(input_tensor, second_count)
+```
+
+return the outputs given the list of frames matrix
+
