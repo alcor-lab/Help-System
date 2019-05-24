@@ -8,7 +8,7 @@ Usefull functions:
   compute_pose(img)
     returns openPose pafMat and heatMat
     
-  compound_channel(img, flow, heatMat, pafMat)
+  compound_channel(img, flow, heatMat, pafMat) \\
     stack the rgb image, the optical flow, the heatMat and the pafMat along the channel dimension returning a
     7 channel picture.
     
