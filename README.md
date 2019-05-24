@@ -1,7 +1,9 @@
 # Help-System
 
 ## Installation
-after downloading the repository download the content of this folder and place it in the /model folder.
+1) downloade the repository 
+2) create "\model" folder in the repository
+4) download the network files from this link and place it in the "\model" folder.
 https://drive.google.com/drive/folders/1aSM6h17ZQYegrOA8IK_qw2eN_nF4rOWV?usp=sharing
 
 ## Usage and functions
