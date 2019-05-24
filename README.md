@@ -1,7 +1,10 @@
 # Help-System
 
-## Usage
+## Installation
+after downloading the repository download the content of this folder and place it in the /model folder.
+https://drive.google.com/drive/folders/1aSM6h17ZQYegrOA8IK_qw2eN_nF4rOWV?usp=sharing
 
+## Usage and functions
 Here is a list of the usefull functions contained in the class. to use start by calling the class:
 
 ```python
@@ -9,8 +12,6 @@ import activity_network
   
 helpnet = activity_network.activity_network()
 ```
-
-### Functions
 
 ```python
 flow = helpnet.compute_optical_flow(frame, frame_prev)
