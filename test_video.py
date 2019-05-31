@@ -117,7 +117,7 @@ def test():
                                 obj = id_to_word[np.argmax(obj, axis=0)]
                                 place = id_to_word[np.argmax(place, axis=0)]
                                 help_word = action + ' ' + obj + ' ' + place
-                                now_target = id_to_label[ordered_collection[path][s-config.seq_len]['now_label']]
+                                now_target = id_to_label[ordered_collection[path][s-config.seq_len+1]['now_label']]
                                 next_label = id_to_label[ordered_collection[path][s]['next_label']]
                                 help_label = id_to_label[ordered_collection[path][s]['help']]
                                 if now_word == now_target:
