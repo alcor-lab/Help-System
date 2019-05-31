@@ -32,6 +32,9 @@ import cv2
 import numpy as np
 import multiprocessing.dummy as mt
 import config
+import pprint
+pp = pprint.PrettyPrinter(indent=4)
+
 # from network_seq import activity_network
 # from network_seq import Training
 # from network_seq import Input_manager
