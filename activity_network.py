@@ -198,7 +198,7 @@ class activity_network:
         if number_of_second != config.seq_len:
             raise ValueError('not correct number of seconds')
         
-        tensor = np.zeros(shape=(1, 1, config.seq_len, config.frames_per_step, config.out_H, config.out_W, 7), dtype=np.uint8)
+        tensor = np.zeros(shape=(4, 1, config.seq_len, config.frames_per_step, config.out_H, config.out_W, 7), dtype=np.uint8)
 
         i=0
         for second in seconds:
