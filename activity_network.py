@@ -86,17 +86,14 @@ class activity_network:
         # self.architecture = tf.train.import_meta_graph('./checkpoint')
         self.architecture = tf.train.import_meta_graph('model/activity_network_model.ckpt.meta')
         self.create_graph_log()
-        operations = self.graph.get_operations()
-        pp.pprint(operations)
-        loader = self.graph.get_operation_by_name("Saver_and_Loader/save/restore_all")
         ckpts = tf.train.latest_checkpoint('./checkpoint')
-        # vars_in_checkpoint = tf.train.list_variables(ckpts)
-        # var_rest = []
-        # for el in vars_in_checkpoint:
-        #     var_rest.append(el[0])
-        # variables = tf.contrib.slim.get_variables_to_restore()
-        # var_list = [v for v in variables if v.name.split(':')[0] in var_rest]
-        # loader = tf.train.Saver(var_list=var_list)
+        vars_in_checkpoint = tf.train.list_variables(ckpts)
+        var_rest = []
+        for el in vars_in_checkpoint:
+            var_rest.append(el[0])
+        variables = tf.contrib.slim.get_variables_to_restore()
+        var_list = [v for v in variables if v.name.split(':')[0] in var_rest]
+        loader = tf.train.Saver(var_list=var_list)
         loader.restore(self.sess, ckpts)
 
         # self.saver = self.graph.get_tensor_by_name("Saver_and_Loader/whole_saver/saver:0")
