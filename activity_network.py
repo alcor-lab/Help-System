@@ -260,7 +260,7 @@ class activity_network:
         # compute results from network given list of second tensor and last second time count
         tensor = self.create_input_tensor_given_seconds(seconds)
 
-        now_softmax, next_softmax, help_softmax = self.compute_activity_given_tensor(tensor, second_count)
+        now_softmax, next_softmax, help_softmax, c3d_softmax = self.compute_activity_given_tensor(tensor, second_count)
 
         return now_softmax, next_softmax, help_softmax, c3d_softmax
 
@@ -268,7 +268,7 @@ class activity_network:
         # compute results from network given list of list of frames and last second time count
         tensor = self.create_input_tensor_given_preprocessed_frame(frames_collection)
 
-        now_softmax, next_softmax, help_softmax = self.compute_activity_given_tensor(tensor, second_count)
+        now_softmax, next_softmax, help_softmax, c3d_softmax = self.compute_activity_given_tensor(tensor, second_count)
 
         return now_softmax, next_softmax, help_softmax, c3d_softmax
 
