@@ -1,10 +1,45 @@
+
+import logging
+import logging.config
+from logging.config import dictConfig
+import os
+logging_config = dict(
+    version = 1,
+    formatters = {
+        'f': {'format':
+              '%(asctime)s %(name)-12s %(levelname)-8s %(message)s'}
+        },
+    handlers = {
+        'h': {'class': 'logging.StreamHandler',
+              'formatter': 'f',
+              'level': logging.WARNING}
+        },
+    root = {
+        'handlers': ['h'],
+        'level': logging.WARNING,
+        },
+)
+
+dictConfig(logging_config)
+
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+logging.getLogger("tensorflow").setLevel(logging.WARNING)
+
+
 import tensorflow as tf
 from tqdm import tqdm
 import cv2
 import numpy as np
 import multiprocessing.dummy as mt
 import config
+from network_seq import activity_network
+from network_seq import Training
+from network_seq import Input_manager
 
+def get_available_gpus():
+    local_device_protos = device_lib.list_local_devices()
+    return [x for x in local_device_protos if x.device_type == 'GPU']
+    # return local_device_protos
 
 class activity_network:
     def __init__(self, sess=None):
@@ -17,19 +52,54 @@ class activity_network:
         # load architecture in graph and weights in session and initialize
 
         self.graph = tf.get_default_graph()
-        self.architecture = tf.train.import_meta_graph('model/activity_network_model-0.meta')
-        self.latest_ckp = tf.train.latest_checkpoint('model')
+        # self.architecture = tf.train.import_meta_graph('model/activity_network_model.ckpt.meta')
+        # self.latest_ckp = tf.train.latest_checkpoint('model')
         self.create_graph_log()
-        self.init = tf.group(tf.global_variables_initializer(),
-                             tf.local_variables_initializer())
-        self.sess.run(self.init)
 
-        self.architecture.restore(self.sess, self.latest_ckp)
-        self.hidden_states_collection = {}
+        # self.architecture.restore(self.sess, self.latest_ckp)
 
+        number_of_classes = IO_tool.num_classes
+        available_gpus = get_available_gpus()
+        j=0
+        Net_collection = {}
+        Input_net = Input_manager(len(available_gpus), IO_tool)
+        for device in available_gpus:
+            with tf.device(device.name):
+                print(device.name)
+                with tf.variable_scope('Network') as scope:
+                    if j>0:
+                        scope.reuse_variables()
+                    Net_collection['Network_' + str(j)] = activity_network(number_of_classes, Input_net, j, IO_tool)
+                    j = j+1
+        # with tf.device(available_gpus[-1].name):
+        Train_Net = Training(Net_collection, IO_tool)
+        IO_tool.start_openPose()
+        train_writer = tf.summary.FileWriter("logdir/train", sess.graph)
+        val_writer = tf.summary.FileWriter("logdir/val", sess.graph)
+        
+        IO_tool.openpose.load_openpose_weights()
+        sess.run(Train_Net.init)
+        Train_Net.model_saver.restore(sess, tf.train.latest_checkpoint('./checkpoint'))
+
+        # self.architecture = tf.train.import_meta_graph('./checkpoint')
+        # ckpts = tf.train.latest_checkpoint('./checkpoint')
+        # vars_in_checkpoint = tf.train.list_variables(ckpts)
+        # var_rest = []
+        # for el in vars_in_checkpoint:
+        #     var_rest.append(el[0])
+        # variables = tf.contrib.slim.get_variables_to_restore()
+        # var_list = [v for v in variables if v.name.split(':')[0] in var_rest]
+        # loader = tf.train.Saver(var_list=var_list)
+        # loader.restore(self.sess, ckpts)
+
+        # self.saver = self.graph.get_tensor_by_name("Saver_and_Loader/whole_saver/saver:0")
+        # self.saver.restore(self.sess, self.latest_ckp )
+
+        # tf.saved_model.loader.load(self.sess, export_dir = 'model/activity_network_model.ckpt.meta')
 
         # Show progress bar to visualize datasets creation
         self.use_pbar = True
+        self.hidden_states_collection = {}
 
         # Retrieving Pose input and outputs
         self.pose_input = self.graph.get_tensor_by_name('image:0')
@@ -76,8 +146,11 @@ class activity_network:
         pafMat = np.amax(pafMat, axis=2)
         heatMat = cv2.resize(heatMat, dsize=(config.out_H, config.out_W), interpolation=cv2.INTER_CUBIC)
         pafMat = cv2.resize(pafMat, dsize=(config.out_H, config.out_W), interpolation=cv2.INTER_CUBIC)
+        norm_pafMat = cv2.normalize(pafMat, None, 0, 255, cv2.NORM_MINMAX)
+        norm_heatMat = cv2.normalize(heatMat, None, 0, 255, cv2.NORM_MINMAX)
+
         # pafMat, heatMat = self.IO_tool.openpose.compute_pose_frame(img)
-        return pafMat, heatMat
+        return norm_pafMat, norm_heatMat
 
     def compound_channel(self, img, flow, heatMat, pafMat):
         # stack rgb, flow, heatMat and pafMat
@@ -95,8 +168,8 @@ class activity_network:
         if shape_pafMat[0] != config.op_input_height:
             pafMat = cv2.resize(pafMat, dsize=(config.out_H, config.out_W), interpolation=cv2.INTER_CUBIC)
         frame[..., :3] = img
-        frame[..., 3] = heatMat
-        frame[..., 4] = pafMat
+        frame[..., 3] = pafMat
+        frame[..., 4] = heatMat
         frame[..., 5:7] = flow
         return frame
 
@@ -123,14 +196,14 @@ class activity_network:
         if number_of_second != config.seq_len:
             raise ValueError('not correct number of seconds')
         
-        tensor = np.zeros(shape=(1, 1, config.frames_per_step, config.out_H, config.out_W, 7), dtype=np.uint8)
+        tensor = np.zeros(shape=(1, 1, config.seq_len, config.frames_per_step, config.out_H, config.out_W, 7), dtype=np.uint8)
 
         i=0
         for second in seconds:
             shape_second = second.shape
             if shape_second[0] != config.frames_per_step:
                 raise ValueError('not correct number of frame in second matrix')
-            tensor[1, 1, i, ...] = second
+            tensor[0, 0, i, :, :, :, :] = second
             i += 1
 
         return tensor
@@ -154,11 +227,11 @@ class activity_network:
         c = np.zeros(shape=(1, len(config.encoder_lstm_layers), 1, config.hidden_states_dim), dtype=float)
         h = np.zeros(shape=(1, len(config.encoder_lstm_layers), 1, config.hidden_states_dim), dtype=float)
         retrieve_id = second_id - config.seq_len 
-        if retrieve_id in self.hidden_states_collection:
-            c[1, :, 1, :] = self.hidden_states_collection[retrieve_id]['c']
-            h[1, :, 1, :] = self.hidden_states_collection[retrieve_id]['h']
+        if retrieve_id in self.hidden_states_collection.keys():
+            c[0, :, :, :] = self.hidden_states_collection[retrieve_id]['c']
+            h[0, :, :, :] = self.hidden_states_collection[retrieve_id]['h']
         else:
-            print('ATTENTION: hiddend state not found')
+            print('\nATTENTION: hiddend state not found')
         return c, h
 
     def save_hidden_state(self, second_id, c, h):
@@ -179,7 +252,7 @@ class activity_network:
 
         self.save_hidden_state(second_count, c_out, h_out)
 
-        return now_softmax, next_softmax, help_softmax
+        return now_softmax[0,:4,:], next_softmax, help_softmax[0,:3,:]
     
     def compute_activity_given_seconds_matrix(self, seconds, second_count):     
         # compute results from network given list of second tensor and last second time count
@@ -198,4 +271,4 @@ class activity_network:
         return now_softmax, next_softmax, help_softmax
 
     
-activity_network = activity_network()
+# activity_network = activity_network()
