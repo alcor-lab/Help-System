@@ -104,8 +104,8 @@ def test():
                                 output_collection[path][s]['next_softmax'] = next_softmax
                                 output_collection[path][s]['help_softmax'] = help_softmax
                                 output_collection[path][s]['c3d_softmax'] = c3d_softmax
-                                now_word = now_softmax[-1,:]
-                                c3d_word = c3d_softmax[-1,:]
+                                now_word = now_softmax[0,:]
+                                c3d_word = c3d_softmax[0,:]
                                 next_word =next_softmax[-1,:]
                                 action = help_softmax[0,:]
                                 obj = help_softmax[1,:]
@@ -117,7 +117,7 @@ def test():
                                 obj = id_to_word[np.argmax(obj, axis=0)]
                                 place = id_to_word[np.argmax(place, axis=0)]
                                 help_word = action + ' ' + obj + ' ' + place
-                                now_target = id_to_label[ordered_collection[path][s]['now_label']]
+                                now_target = id_to_label[ordered_collection[path][s-config.seq_len]['now_label']]
                                 next_label = id_to_label[ordered_collection[path][s]['next_label']]
                                 help_label = id_to_label[ordered_collection[path][s]['help']]
                                 if now_word == now_target:
