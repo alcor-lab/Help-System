@@ -246,7 +246,7 @@ class activity_network:
         # compute results from network given tensor and last second time count 
         c, h =self.retrieve_hidden_state(second_count)
 
-        now_softmax, help_softmax, next_softmax, c_out, h_out = self.sess.run([self.now_softmax, self.help_softmax, self.next_softmax,
+        now_softmax, help_softmax, next_softmax, c3d_softmax, c_out, h_out = self.sess.run([self.now_softmax, self.help_softmax, self.next_softmax, self.c3d_softmax,
                                                                                 self.c_out, self.h_out],
                                                                                 feed_dict={self.input: tensor,
                                                                                             self.h_input: h,
@@ -254,7 +254,7 @@ class activity_network:
 
         self.save_hidden_state(second_count, c_out, h_out)
 
-        return now_softmax[0,:4,:], next_softmax, help_softmax[0,:3,:]
+        return now_softmax[0,:4,:], next_softmax, help_softmax[0,:3,:], c3d_softmax
     
     def compute_activity_given_seconds_matrix(self, seconds, second_count):     
         # compute results from network given list of second tensor and last second time count
@@ -262,7 +262,7 @@ class activity_network:
 
         now_softmax, next_softmax, help_softmax = self.compute_activity_given_tensor(tensor, second_count)
 
-        return now_softmax, next_softmax, help_softmax
+        return now_softmax, next_softmax, help_softmax, c3d_softmax
 
     def compute_activity_given_frame_list(self, frames_collection, second_count):
         # compute results from network given list of list of frames and last second time count
@@ -270,7 +270,7 @@ class activity_network:
 
         now_softmax, next_softmax, help_softmax = self.compute_activity_given_tensor(tensor, second_count)
 
-        return now_softmax, next_softmax, help_softmax
+        return now_softmax, next_softmax, help_softmax, c3d_softmax
 
     
 # activity_network = activity_network()

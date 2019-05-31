@@ -57,6 +57,7 @@ def test():
                 obj = ''
                 place = ''
                 correct_now = 0
+                correct_c3d = 0
                 correct_next = 0
                 correct_help = 0
                 for s in range(seconds):
@@ -97,17 +98,20 @@ def test():
                         second_matrix = net.compound_second_frames(frames_collection)
                         second_collection.append(second_matrix)
                         if s >= 3:
-                                now_softmax, next_softmax, help_softmax = net.compute_activity_given_seconds_matrix(second_collection[-4:], s)
+                                now_softmax, next_softmax, help_softmax, c3d_softmax = net.compute_activity_given_seconds_matrix(second_collection[-4:], s)
                                 output_collection[path][s] = {}
                                 output_collection[path][s]['now_softmax'] = now_softmax
                                 output_collection[path][s]['next_softmax'] = next_softmax
                                 output_collection[path][s]['help_softmax'] = help_softmax
+                                output_collection[path][s]['c3d_softmax'] = c3d_softmax
                                 now_word = now_softmax[-1,:]
+                                c3d_word = c3d_softmax[-1,:]
                                 next_word =next_softmax[-1,:]
                                 action = help_softmax[0,:]
                                 obj = help_softmax[1,:]
                                 place = help_softmax[2,:]
                                 now_word = id_to_word[np.argmax(now_word, axis=0)]
+                                c3d_word = id_to_word[np.argmax(c3d_word, axis=0)]
                                 next_word = id_to_word[np.argmax(next_word, axis=0)]
                                 action = id_to_word[np.argmax(action, axis=0)]
                                 obj = id_to_word[np.argmax(obj, axis=0)]
@@ -118,15 +122,17 @@ def test():
                                 help_label = id_to_label[ordered_collection[path][s]['help']]
                                 if now_word == now_target:
                                         correct_now += 1
+                                if c3d_word == now_target:
+                                        correct_c3d += 1
                                 if next_label == next_word:
                                         correct_next += 1
                                 if help_label == help_word:
                                         correct_help += 1
 
                                 print('\n')
-                                print(' ', now_word, next_word, action, obj, place)
-                                print(' ', now_target, next_label, help_label)
-                                print(' ', float(correct_now)/(s+1), float(correct_next)/(s+1), float(correct_help)/(s+1))
+                                print(' ', now_word, c3d_word, next_word, action, obj, place)
+                                print(' ', now_target, now_target, next_label, help_label)
+                                print(' ', float(correct_now)/(s+1), float(correct_c3d)/(s+1), float(correct_next)/(s+1), float(correct_help)/(s+1))
                         
                         # pbar_second.update(1)
                 pbar_second.refresh()
