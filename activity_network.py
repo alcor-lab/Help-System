@@ -251,7 +251,7 @@ class activity_network:
 
         for seq in range(tensor.shape[2]):
             for frame in range(tensor.shape[3]):
-                cv2.imwrite('test_pic/'+str(second_count) +str(seq) +str(frame)+ '_rgb.jpg',tensor0,0,seq,frame[:, :, :3])
+                cv2.imwrite('test_pic/'+str(second_count) +str(seq) +str(frame)+ '_rgb.jpg',tensor[0,0,seq,frame, :, :, :3])
                 cv2.imwrite('test_pic/'+str(second_count) +str(seq) +str(frame) + '_flow_1.jpg',tensor[0,0,seq,frame:, :, 5])
                 cv2.imwrite('test_pic/'+str(second_count) +str(seq) +str(frame) + '_flow_2.jpg',tensor[0,0,seq,frame:, :, 6])
                 cv2.imwrite('test_pic/'+str(second_count) +str(seq) +str(frame) + '_pafMat.jpg',tensor[0,0,seq,frame:, :, 3])
