@@ -88,7 +88,7 @@ class activity_network:
         self.create_graph_log()
         operations = self.graph.get_operations()
         pp.pprint(operations)
-        loader = tf.get_operation_by_name("Saver_and_Loader/save")
+        loader = tf.graph.get_operation_by_name("Saver_and_Loader/save/restore_all")
         ckpts = tf.train.latest_checkpoint('./checkpoint')
         # vars_in_checkpoint = tf.train.list_variables(ckpts)
         # var_rest = []
