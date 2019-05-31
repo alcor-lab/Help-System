@@ -83,14 +83,15 @@ class activity_network:
         # self.architecture = tf.train.import_meta_graph('./checkpoint')
         self.architecture = tf.train.import_meta_graph('model/activity_network_model.ckpt.meta')
         self.create_graph_log()
-        ckpts = tf.train.latest_checkpoint('./checkpoint')
-        vars_in_checkpoint = tf.train.list_variables(ckpts)
-        var_rest = []
-        for el in vars_in_checkpoint:
-            var_rest.append(el[0])
-        variables = tf.contrib.slim.get_variables_to_restore()
-        var_list = [v for v in variables if v.name.split(':')[0] in var_rest]
-        loader = tf.train.Saver(var_list=var_list)
+        loader = self.graph.get_variable("Saver_and_Loader/save")
+        # ckpts = tf.train.latest_checkpoint('./checkpoint')
+        # vars_in_checkpoint = tf.train.list_variables(ckpts)
+        # var_rest = []
+        # for el in vars_in_checkpoint:
+        #     var_rest.append(el[0])
+        # variables = tf.contrib.slim.get_variables_to_restore()
+        # var_list = [v for v in variables if v.name.split(':')[0] in var_rest]
+        # loader = tf.train.Saver(var_list=var_list)
         loader.restore(self.sess, ckpts)
 
         # self.saver = self.graph.get_tensor_by_name("Saver_and_Loader/whole_saver/saver:0")
@@ -246,7 +247,6 @@ class activity_network:
         # compute results from network given tensor and last second time count 
         c, h =self.retrieve_hidden_state(second_count)
 
-        print(tensor[0])
         now_softmax, help_softmax, next_softmax, c3d_softmax, c_out, h_out = self.sess.run([self.now_softmax, self.help_softmax, self.next_softmax, self.c3d_softmax,
                                                                                 self.c_out, self.h_out],
                                                                                 feed_dict={self.input: tensor,
