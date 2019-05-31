@@ -96,6 +96,7 @@ class activity_network:
         init_global = tf.global_variables_initializer()
         init_local = tf.local_variables_initializer()
         self.init = tf.group(init_local, init_global)
+        self.sess.run(self.init)
 
         # self.saver = self.graph.get_tensor_by_name("Saver_and_Loader/whole_saver/saver:0")
         # self.saver.restore(self.sess, self.latest_ckp )
