@@ -252,10 +252,10 @@ class activity_network:
         for seq in range(tensor.shape[2]):
             for frame in range(tensor.shape[3]):
                 cv2.imwrite('test_pic/'+str(second_count) +str(seq) +str(frame)+ '_rgb.jpg',tensor[0,0,seq,frame, :, :, :3])
-                cv2.imwrite('test_pic/'+str(second_count) +str(seq) +str(frame) + '_flow_1.jpg',tensor[0,0,seq,frame:, :, 5])
-                cv2.imwrite('test_pic/'+str(second_count) +str(seq) +str(frame) + '_flow_2.jpg',tensor[0,0,seq,frame:, :, 6])
-                cv2.imwrite('test_pic/'+str(second_count) +str(seq) +str(frame) + '_pafMat.jpg',tensor[0,0,seq,frame:, :, 3])
-                cv2.imwrite('test_pic/'+str(second_count) +str(seq) +str(frame) + '_heatMat.jpg',tensor[0,0,seq,frame:, :, 4])
+                cv2.imwrite('test_pic/'+str(second_count) +str(seq) +str(frame) + '_flow_1.jpg',tensor[0,0,seq,frame, :, :, 5])
+                cv2.imwrite('test_pic/'+str(second_count) +str(seq) +str(frame) + '_flow_2.jpg',tensor[0,0,seq,frame, :, :, 6])
+                cv2.imwrite('test_pic/'+str(second_count) +str(seq) +str(frame) + '_pafMat.jpg',tensor[0,0,seq,frame, :, :, 3])
+                cv2.imwrite('test_pic/'+str(second_count) +str(seq) +str(frame) + '_heatMat.jpg',tensor[0,0,seq,frame, :, :, 4])
 
 
         now_softmax, help_softmax, next_softmax, c3d_softmax, c_out, h_out = self.sess.run([self.now_softmax, self.help_softmax, self.next_softmax, self.c3d_softmax,
