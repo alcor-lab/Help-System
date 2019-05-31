@@ -85,11 +85,11 @@ class activity_network:
 
         # self.architecture = tf.train.import_meta_graph('./checkpoint')
         self.architecture = tf.train.import_meta_graph('checkpoint/Net_weigths.model-1000000.meta')
+        self.create_graph_log()
         ckpts = tf.train.latest_checkpoint('./checkpoint')
         loader = tf.train.Saver()
         loader.restore(self.sess, ckpts)
         # self.architecture = tf.train.import_meta_graph('model/activity_network_model.ckpt.meta')
-        # self.create_graph_log()
         # ckpts = tf.train.latest_checkpoint('./checkpoint')
         # vars_in_checkpoint = tf.train.list_variables(ckpts)
         # var_rest = []
