@@ -251,6 +251,7 @@ class activity_network:
         # compute results from network given tensor and last second time count 
         c, h =self.retrieve_hidden_state(second_count)
 
+        print(tensor)
         now_softmax, help_softmax, next_softmax, c3d_softmax, c_out, h_out = self.sess.run([self.now_softmax, self.help_softmax, self.next_softmax, self.c3d_softmax,
                                                                                 self.c_out, self.h_out],
                                                                                 feed_dict={self.input: tensor,
