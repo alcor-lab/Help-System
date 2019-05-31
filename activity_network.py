@@ -48,7 +48,7 @@ class activity_network:
     def __init__(self, sess=None):
         # creating a Session
         if sess is None:
-            self.sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True, log_device_placement=True))
+            self.sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True, log_device_placement=False))
         else:
             self.sess = sess
 
@@ -128,6 +128,8 @@ class activity_network:
         # self.h_out = self.graph.get_tensor_by_name("Network/Activity_Recognition_Network/Lstm_encoder/h_out:0")
         self.c_out = self.graph.get_tensor_by_name("Network/Activity_Recognition_Network/Lstm_encoder/concat_2:0")
         self.h_out = self.graph.get_tensor_by_name("Network/Activity_Recognition_Network/Lstm_encoder/concat_3:0")
+        self.fake_now_label = self.graph.get_tensor_by_name('Inputs/Target/now_label:0')
+        self.empyt_labels = np.zeros(shape=(Devices, config.Batch_size,config.seq_len + 1), dtype=int)
 
     def create_graph_log(self):
         # This function create a tensorboard log which shows the network as_graph_def
@@ -268,6 +270,7 @@ class activity_network:
                                                                                 self.c_out, self.h_out],
                                                                                 feed_dict={self.input: tensor,
                                                                                             self.h_input: h,
+                                                                                            self.fake_now_label: self.empyt_labels,
                                                                                             self.c_input: c})
 
         self.save_hidden_state(second_count, c_out, h_out)
