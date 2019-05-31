@@ -48,7 +48,7 @@ class activity_network:
     def __init__(self, sess=None):
         # creating a Session
         if sess is None:
-            self.sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True, log_device_placement=True)
+            self.sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True, log_device_placement=True))
         else:
             self.sess = sess
 
