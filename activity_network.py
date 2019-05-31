@@ -32,9 +32,9 @@ import cv2
 import numpy as np
 import multiprocessing.dummy as mt
 import config
-from network_seq import activity_network
-from network_seq import Training
-from network_seq import Input_manager
+# from network_seq import activity_network
+# from network_seq import Training
+# from network_seq import Input_manager
 
 def get_available_gpus():
     local_device_protos = device_lib.list_local_devices()
@@ -54,43 +54,43 @@ class activity_network:
         self.graph = tf.get_default_graph()
         # self.architecture = tf.train.import_meta_graph('model/activity_network_model.ckpt.meta')
         # self.latest_ckp = tf.train.latest_checkpoint('model')
-        self.create_graph_log()
 
         # self.architecture.restore(self.sess, self.latest_ckp)
 
-        number_of_classes = IO_tool.num_classes
-        available_gpus = get_available_gpus()
-        j=0
-        Net_collection = {}
-        Input_net = Input_manager(len(available_gpus), IO_tool)
-        for device in available_gpus:
-            with tf.device(device.name):
-                print(device.name)
-                with tf.variable_scope('Network') as scope:
-                    if j>0:
-                        scope.reuse_variables()
-                    Net_collection['Network_' + str(j)] = activity_network(number_of_classes, Input_net, j, IO_tool)
-                    j = j+1
+        # number_of_classes = IO_tool.num_classes
+        # available_gpus = get_available_gpus()
+        # j=0
+        # Net_collection = {}
+        # Input_net = Input_manager(len(available_gpus), IO_tool)
+        # for device in available_gpus:
+        #     with tf.device(device.name):
+        #         print(device.name)
+        #         with tf.variable_scope('Network') as scope:
+        #             if j>0:
+        #                 scope.reuse_variables()
+        #             Net_collection['Network_' + str(j)] = activity_network(number_of_classes, Input_net, j, IO_tool)
+        #             j = j+1
         # with tf.device(available_gpus[-1].name):
-        Train_Net = Training(Net_collection, IO_tool)
-        IO_tool.start_openPose()
-        train_writer = tf.summary.FileWriter("logdir/train", sess.graph)
-        val_writer = tf.summary.FileWriter("logdir/val", sess.graph)
+        # Train_Net = Training(Net_collection, IO_tool)
+        # IO_tool.start_openPose()
+        # train_writer = tf.summary.FileWriter("logdir/train", sess.graph)
+        # val_writer = tf.summary.FileWriter("logdir/val", sess.graph)
         
-        IO_tool.openpose.load_openpose_weights()
-        sess.run(Train_Net.init)
-        Train_Net.model_saver.restore(sess, tf.train.latest_checkpoint('./checkpoint'))
+        # IO_tool.openpose.load_openpose_weights()
+        # sess.run(Train_Net.init)
+        # Train_Net.model_saver.restore(sess, tf.train.latest_checkpoint('./checkpoint'))
 
-        # self.architecture = tf.train.import_meta_graph('./checkpoint')
-        # ckpts = tf.train.latest_checkpoint('./checkpoint')
-        # vars_in_checkpoint = tf.train.list_variables(ckpts)
-        # var_rest = []
-        # for el in vars_in_checkpoint:
-        #     var_rest.append(el[0])
-        # variables = tf.contrib.slim.get_variables_to_restore()
-        # var_list = [v for v in variables if v.name.split(':')[0] in var_rest]
-        # loader = tf.train.Saver(var_list=var_list)
-        # loader.restore(self.sess, ckpts)
+        self.architecture = tf.train.import_meta_graph('./checkpoint')
+        ckpts = tf.train.latest_checkpoint('./checkpoint')
+        vars_in_checkpoint = tf.train.list_variables(ckpts)
+        var_rest = []
+        for el in vars_in_checkpoint:
+            var_rest.append(el[0])
+        variables = tf.contrib.slim.get_variables_to_restore()
+        var_list = [v for v in variables if v.name.split(':')[0] in var_rest]
+        loader = tf.train.Saver(var_list=var_list)
+        loader.restore(self.sess, ckpts)
+        self.create_graph_log()
 
         # self.saver = self.graph.get_tensor_by_name("Saver_and_Loader/whole_saver/saver:0")
         # self.saver.restore(self.sess, self.latest_ckp )
@@ -112,6 +112,7 @@ class activity_network:
         self.input = self.graph.get_tensor_by_name("Inputs/Input/Input:0")
         self.h_input = self.graph.get_tensor_by_name("Inputs/Input/h_input:0")
         self.c_input = self.graph.get_tensor_by_name("Inputs/Input/c_input:0")
+        self.c3d_softmax = self.graph.get_tensor_by_name("Network/Activity_Recognition_Network/c3d_classifier/Softmax:0")
         self.now_softmax = self.graph.get_tensor_by_name("Network/Activity_Recognition_Network/Now_Decoder_inference/softmax_out:0")
         self.help_softmax = self.graph.get_tensor_by_name("Network/Activity_Recognition_Network/Help_Decoder_inference/softmax_out:0")
         self.next_softmax = self.graph.get_tensor_by_name("Network/Activity_Recognition_Network/Next_classifier/softmax_out:0")
