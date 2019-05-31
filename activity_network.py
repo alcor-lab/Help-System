@@ -84,17 +84,21 @@ class activity_network:
         # Train_Net.model_saver.restore(sess, tf.train.latest_checkpoint('./checkpoint'))
 
         # self.architecture = tf.train.import_meta_graph('./checkpoint')
-        self.architecture = tf.train.import_meta_graph('model/activity_network_model.ckpt.meta')
-        self.create_graph_log()
+        self.architecture = tf.train.import_meta_graph('checkpoint/Net_weigths.model-1000000.meta')
         ckpts = tf.train.latest_checkpoint('./checkpoint')
-        vars_in_checkpoint = tf.train.list_variables(ckpts)
-        var_rest = []
-        for el in vars_in_checkpoint:
-            var_rest.append(el[0])
-        variables = tf.contrib.slim.get_variables_to_restore()
-        var_list = [v for v in variables if v.name.split(':')[0] in var_rest]
-        loader = tf.train.Saver(var_list=var_list)
+        loader = tf.train.Saver()
         loader.restore(self.sess, ckpts)
+        # self.architecture = tf.train.import_meta_graph('model/activity_network_model.ckpt.meta')
+        # self.create_graph_log()
+        # ckpts = tf.train.latest_checkpoint('./checkpoint')
+        # vars_in_checkpoint = tf.train.list_variables(ckpts)
+        # var_rest = []
+        # for el in vars_in_checkpoint:
+        #     var_rest.append(el[0])
+        # variables = tf.contrib.slim.get_variables_to_restore()
+        # var_list = [v for v in variables if v.name.split(':')[0] in var_rest]
+        # loader = tf.train.Saver(var_list=var_list)
+        # loader.restore(self.sess, ckpts)
 
         # self.saver = self.graph.get_tensor_by_name("Saver_and_Loader/whole_saver/saver:0")
         # self.saver.restore(self.sess, self.latest_ckp )
@@ -249,13 +253,13 @@ class activity_network:
         # compute results from network given tensor and last second time count 
         c, h =self.retrieve_hidden_state(second_count)
 
-        for seq in range(tensor.shape[2]):
-            for frame in range(tensor.shape[3]):
-                cv2.imwrite('test_pic/'+str(second_count) +str(seq) +str(frame)+ '_rgb.jpg',tensor[0,0,seq,frame, :, :, :3])
-                cv2.imwrite('test_pic/'+str(second_count) +str(seq) +str(frame) + '_flow_1.jpg',tensor[0,0,seq,frame, :, :, 5])
-                cv2.imwrite('test_pic/'+str(second_count) +str(seq) +str(frame) + '_flow_2.jpg',tensor[0,0,seq,frame, :, :, 6])
-                cv2.imwrite('test_pic/'+str(second_count) +str(seq) +str(frame) + '_pafMat.jpg',tensor[0,0,seq,frame, :, :, 3])
-                cv2.imwrite('test_pic/'+str(second_count) +str(seq) +str(frame) + '_heatMat.jpg',tensor[0,0,seq,frame, :, :, 4])
+        # for seq in range(tensor.shape[2]):
+        #     for frame in range(tensor.shape[3]):
+        #         cv2.imwrite('test_pic/'+str(second_count) +str(seq) +str(frame)+ '_rgb.jpg',tensor[0,0,seq,frame, :, :, :3])
+        #         cv2.imwrite('test_pic/'+str(second_count) +str(seq) +str(frame) + '_flow_1.jpg',tensor[0,0,seq,frame, :, :, 5])
+        #         cv2.imwrite('test_pic/'+str(second_count) +str(seq) +str(frame) + '_flow_2.jpg',tensor[0,0,seq,frame, :, :, 6])
+        #         cv2.imwrite('test_pic/'+str(second_count) +str(seq) +str(frame) + '_pafMat.jpg',tensor[0,0,seq,frame, :, :, 3])
+        #         cv2.imwrite('test_pic/'+str(second_count) +str(seq) +str(frame) + '_heatMat.jpg',tensor[0,0,seq,frame, :, :, 4])
 
 
         now_softmax, help_softmax, next_softmax, c3d_softmax, c_out, h_out = self.sess.run([self.now_softmax, self.help_softmax, self.next_softmax, self.c3d_softmax,
