@@ -80,7 +80,8 @@ class activity_network:
         # sess.run(Train_Net.init)
         # Train_Net.model_saver.restore(sess, tf.train.latest_checkpoint('./checkpoint'))
 
-        self.architecture = tf.train.import_meta_graph('./checkpoint')
+        # self.architecture = tf.train.import_meta_graph('./checkpoint')
+        self.architecture = tf.train.import_meta_graph('model/activity_network_model.ckpt.meta')
         ckpts = tf.train.latest_checkpoint('./checkpoint')
         vars_in_checkpoint = tf.train.list_variables(ckpts)
         var_rest = []
