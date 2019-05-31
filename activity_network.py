@@ -129,7 +129,7 @@ class activity_network:
         self.c_out = self.graph.get_tensor_by_name("Network/Activity_Recognition_Network/Lstm_encoder/concat_2:0")
         self.h_out = self.graph.get_tensor_by_name("Network/Activity_Recognition_Network/Lstm_encoder/concat_3:0")
         self.fake_now_label = self.graph.get_tensor_by_name('Inputs/Target/now_label:0')
-        self.empyt_labels = np.zeros(shape=(Devices, config.Batch_size,config.seq_len + 1), dtype=int)
+        self.empyt_labels = np.zeros(shape=(4, 1,config.seq_len + 1), dtype=int)
 
     def create_graph_log(self):
         # This function create a tensorboard log which shows the network as_graph_def
