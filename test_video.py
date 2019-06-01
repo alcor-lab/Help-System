@@ -111,7 +111,7 @@ def test():
                 correct_help_v2= 0
                 for s in range(seconds):
                         
-                        linspace_frame = np.linspace(s*fps+1, (s+1)*fps+1, num=config.frames_per_step)
+                        linspace_frame = np.linspace(s*fps+1, (s+2)*fps+1, num=config.frames_per_step)
                         linspace_frame = [int(x) for x in linspace_frame]
                         if (linspace_frame[-1] == (framecount-1)):
                                 linspace_frame[-1] -= 1
