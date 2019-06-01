@@ -35,7 +35,7 @@ def test():
 
         pbar_video = tqdm(total=len(path_collection), leave=False, desc='Videos')
 
-        RED_COLOR = (255,0,0)
+        RED_COLOR = (0,0,255)
         GREEN_COLOR = (0,255,0)
         for path in path_collection:
                 net.hidden_states_collection = {}
@@ -178,14 +178,14 @@ def test():
                                 else:
                                         color = RED_COLOR
                                 text = 'Now: ' + now_word + ' ' + str(now_prob) 
-                                cv2.putText(im, text ,(30,10),1,1,color)
+                                cv2.putText(im, text ,(10,30),1,1,color)
 
                                 if next_label == next_word:
                                         color = GREEN_COLOR
                                 else:
                                         color = RED_COLOR
                                 text = 'Next: ' + next_word + ' ' + str(next_prob)
-                                cv2.putText(im, text ,(60,10),1,1,color)
+                                cv2.putText(im, text ,(10,60),1,1,color)
                                 out.write(im)
                         
                         pbar_second.update(1)
