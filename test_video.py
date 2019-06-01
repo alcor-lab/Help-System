@@ -123,9 +123,9 @@ def test():
                         print(one_input.shape)
                         print(second_matrix.shape)
                         print(vers2_matrix.shape)
-                        print(numpy.array_equal(one_input, second_matrix))
-                        print(numpy.array_equal(one_input, vers2_matrix))
-                        print(numpy.array_equal(vers2_matrix, second_matrix))
+                        print(np.array_equal(one_input, second_matrix))
+                        print(np.array_equal(one_input, vers2_matrix))
+                        print(np.array_equal(vers2_matrix, second_matrix))
                         if s >= 3:
                                 input_sec = second_collection[-4:]
                                 now_softmax, next_softmax, help_softmax, c3d_softmax = net.compute_activity_given_seconds_matrix(input_sec, s)
