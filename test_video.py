@@ -67,6 +67,7 @@ def test():
                 fps = int(video.get(cv2.CAP_PROP_FPS))
                 seconds = int(framecount/fps)
                 second_collection = []
+                vers2_collection = []
                 pbar_second = tqdm(total=seconds, leave=False, desc='seconds')
                 width = int(video.get(cv2.CAP_PROP_FRAME_WIDTH))
                 height = int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))
@@ -120,7 +121,7 @@ def test():
                         vers2_matrix = net.compound_second_frames(frames_collection)
                         second_matrix = net.compound_second_frames(one_input)
                         second_collection.append(second_matrix)
-                        vers2_collection.append(second_matrix)
+                        vers2_collection.append(vers2_matrix)
                         print(one_input.shape)
                         print(second_matrix.shape)
                         print(vers2_matrix.shape)
