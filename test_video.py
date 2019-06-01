@@ -199,10 +199,9 @@ def test():
                                 if help_label == help_word:
                                         correct_help += 1
 
-                                # print('\n')
-                                # print(' ', now_word, c3d_word, next_word, action, obj, place)
-                                # print(' ', now_target, now_target, next_label, help_label)
-                                print('prep ', float(correct_now)/(s+1), float(correct_c3d)/(s+1), float(correct_next)/(s+1), float(correct_help)/(s+1))
+                                print('\n')
+                                print(' ', now_target, now_target, next_label, help_label)
+                                print(' ', now_word, c3d_word, next_word, action, obj, place)
 
                                 # V2
                                 input_sec = vers2_collection[-4:]
@@ -237,9 +236,9 @@ def test():
                                 if help_label == help_word:
                                         correct_help_v2 += 1
 
-                                # print('\n')
-                                # print(' ', now_word, c3d_word, next_word, action, obj, place)
-                                # print(' ', now_target, now_target, next_label, help_label)
+                                print('\n')
+                                print(' ', now_word, c3d_word, next_word, action, obj, place)
+                                print('prep ', float(correct_now)/(s+1), float(correct_c3d)/(s+1), float(correct_next)/(s+1), float(correct_help)/(s+1))
                                 print('stan ', float(correct_now_v2)/(s+1), float(correct_c3d_v2)/(s+1), float(correct_next_v2)/(s+1), float(correct_help_v2)/(s+1))
                         
                         for frame in range(s*fps+1, (s+1)*fps+1):
