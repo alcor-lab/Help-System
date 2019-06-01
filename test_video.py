@@ -19,6 +19,27 @@ def load(name):
     with open('dataset/' + name + '.pkl', 'rb') as f:
         return pickle.load(f)
 
+def extract_preprocessed_one_input(video_path, segment, pbar):
+        one_input = np.zeros(shape=(config.frames_per_step, config.out_H, config.out_W, 7), dtype=float)
+        extracted_frames = {}
+        frame_list = []
+        try:
+            linspace_frame = np.linspace(segment[0], segment[1], num=config.frames_per_step)
+            z = 0
+            for frame in linspace_frame:
+                try:
+                    one_input[z, :, :, :] = prep_dataset_man.get_matrix(video_path, frame)
+                    z += 1
+                except Exception as e:
+                    print(e)
+                    pass
+                pbar.update(1)
+        except Exception as e:
+            print(e)
+            pass
+        frame_list = extracted_frames.keys()
+        return one_input, frame_list
+
 def test():
         prep_dataset = prep_dataset_man.prep_dataset()
         net = activity_network.activity_network()
@@ -77,7 +98,7 @@ def test():
                         z = 0
                         frames_collection = []
                         segment = [int(linspace_frame[0]), int(linspace_frame[-1])+1]
-                        one_input, frame_list = self.extract_preprocessed_one_input(path, segment, pbar)
+                        one_input, frame_list = extract_preprocessed_one_input(path, segment, pbar)
                         # for frame in range(int(linspace_frame[0]), int(linspace_frame[-1])+1):
                         #         video.set(1, frame)
                         #         ret, im = video.read()
