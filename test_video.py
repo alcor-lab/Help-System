@@ -42,7 +42,7 @@ def extract_preprocessed_one_input(video_path, segment, prep_dataset):
 def test():
         prep_dataset = prep_dataset_man.prep_dataset()
         net = activity_network.activity_network()
-        test_collection = load('test_collection')
+        test_collection = load('train_collection')
         id_to_word = load('id_to_word')
         id_to_label = load('id_to_label')
         ordered_collection = load('ordered_collection')
@@ -117,8 +117,8 @@ def test():
                         #                 frame_processed = net.compound_channel(im, flow, heatMat, pafMat)
                         #                 frames_collection.append(frame_processed)
                                 
-                        second_matrix = net.compound_second_frames(one_input)
-                        second_collection.append(second_matrix)
+                        # second_matrix = net.compound_second_frames(one_input)
+                        second_collection.append(one_input)
                         if s >= 3:
                                 input_sec = second_collection[-4:]
                                 now_softmax, next_softmax, help_softmax, c3d_softmax = net.compute_activity_given_seconds_matrix(input_sec, s)
