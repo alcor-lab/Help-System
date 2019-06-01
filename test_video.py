@@ -58,6 +58,7 @@ def test():
                 now_word = ''
                 next_word = ''
                 action = ''
+                help_word = ''
                 obj = ''
                 place = ''
                 correct_now = 0
