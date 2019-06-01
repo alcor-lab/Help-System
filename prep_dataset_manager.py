@@ -39,8 +39,8 @@ class prep_dataset:
         frame_matrix[:, :, :3] = cv2.normalize(im, None, 0, 255, cv2.NORM_MINMAX)
         frame_matrix[:, :, 5] = cv2.normalize(flow_1, None, 0, 255, cv2.NORM_MINMAX)
         frame_matrix[:, :, 6] = cv2.normalize(flow_2, None, 0, 255, cv2.NORM_MINMAX)
-        # frame_matrix[:, :, 3] = cv2.normalize(pafMat, None, 0, 255, cv2.NORM_MINMAX)
-        # frame_matrix[:, :, 4] = cv2.normalize(heatMat, None, 0, 255, cv2.NORM_MINMAX)
+        frame_matrix[:, :, 3] = cv2.normalize(heatMat, None, 0, 255, cv2.NORM_MINMAX)
+        frame_matrix[:, :, 4] = cv2.normalize(pafMat, None, 0, 255, cv2.NORM_MINMAX)
         resized = cv2.resize(frame_matrix, dsize=(config.out_H, config.out_W), interpolation=cv2.INTER_CUBIC)
         resized = resized.astype(np.uint8)
         return resized
