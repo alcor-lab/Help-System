@@ -19,7 +19,7 @@ def load(name):
 
 def test():
         net = activity_network.activity_network()
-        test_collection = load('train_collection')
+        test_collection = load('test_collection')
         id_to_word = load('id_to_word')
         id_to_label = load('id_to_label')
         ordered_collection = load('ordered_collection')
