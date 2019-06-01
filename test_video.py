@@ -133,7 +133,7 @@ def test():
 
                                 now_prob = now_word[now_word_max]
                                 c3d_prob = now_word[c3d_word_max]
-                                next_prob = now_word[next_word_max]
+                                next_prob = next_word[next_word_max]
                                 action_prob = now_word[action_max]
                                 obj_prob = now_word[obj_max]
                                 place_prob = now_word[place_max]
@@ -170,7 +170,11 @@ def test():
                                         color = GREEN_COLOR
                                 else:
                                         color = RED_COLOR
-                                text = 'Help: ' + action + ' ' + obj + ' ' + place + ' ' + str(action_prob) + ' ' + str(obj_prob) + ' ' + str(place_prob) 
+                                text = 'Help: ' + action + ' ' + str(action_prob) 
+                                cv2.putText(im, text ,(10,120),1,1,color,2, bottomLeftOrgin=True)
+                                text = 'Help: '+ obj + ' ' + str(obj_prob)
+                                cv2.putText(im, text ,(10,90),1,1,color,2, bottomLeftOrgin=True)
+                                text = 'Help: ' + place + '' ' + str(place_prob) 
                                 cv2.putText(im, text ,(10,60),1,1,color,2, bottomLeftOrgin=True)
                                 
                                 if now_word == now_target:
