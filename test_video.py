@@ -20,7 +20,7 @@ def load(name):
         return pickle.load(f)
 
 def extract_preprocessed_one_input(video_path, segment, prep_dataset):
-        one_input = np.zeros(shape=(config.frames_per_step, config.out_H, config.out_W, 7), dtype=float)
+        one_input = np.zeros(shape=(config.frames_per_step, config.out_H, config.out_W, 7), dtype=np.uint8)
         extracted_frames = {}
         frame_list = []
         try:
