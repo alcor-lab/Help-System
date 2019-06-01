@@ -61,6 +61,11 @@ def test():
                 help_word = ''
                 obj = ''
                 place = ''
+                action_prob = 0
+                obj_prob    = 0     
+                place_prob  = 0     
+                now_prob    = 0     
+                next_prob   = 0     
                 correct_now = 0
                 correct_c3d = 0
                 correct_next = 0
