@@ -171,21 +171,21 @@ def test():
                                 else:
                                         color = RED_COLOR
                                 text = 'Help: ' + action + ' ' + obj + ' ' + place + ' ' + str(action_prob) + ' ' + str(obj_prob) + ' ' + str(place_prob) 
-                                cv2.putText(im, text ,(10,10),1,1,color)
+                                cv2.putText(im, text ,(10,60),1,1,color,2, bottomLeftOrgin=True)
                                 
                                 if now_word == now_target:
                                         color = GREEN_COLOR
                                 else:
                                         color = RED_COLOR
                                 text = 'Now: ' + now_word + ' ' + str(now_prob) 
-                                cv2.putText(im, text ,(10,30),1,1,color)
+                                cv2.putText(im, text ,(10,30),1,1,color,2, bottomLeftOrgin=True)
 
                                 if next_label == next_word:
                                         color = GREEN_COLOR
                                 else:
                                         color = RED_COLOR
                                 text = 'Next: ' + next_word + ' ' + str(next_prob)
-                                cv2.putText(im, text ,(10,60),1,1,color)
+                                cv2.putText(im, text ,(10,10),1,1,color,2, bottomLeftOrgin=True)
                                 out.write(im)
                         
                         pbar_second.update(1)
