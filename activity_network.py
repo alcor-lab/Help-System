@@ -211,7 +211,6 @@ class activity_network:
                                                                                 self.c_out, self.h_out],
                                                                                 feed_dict={self.input: tensor,
                                                                                             self.h_input: h,
-                                                                                            self.fake_now_label: self.empyt_labels,
                                                                                             self.c_input: c})
 
         self.save_hidden_state(second_count, c_out, h_out)

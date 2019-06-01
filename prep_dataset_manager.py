@@ -16,7 +16,7 @@ class prep_dataset:
         im = cv2.imread(frame_path + '_rgb.jpg', cv2.IMREAD_UNCHANGED)
         flow_1 = cv2.imread(frame_path + '_flow_1.jpg', cv2.IMREAD_UNCHANGED)
         flow_2 = cv2.imread(frame_path + '_flow_2.jpg', cv2.IMREAD_UNCHANGED)
-        pafMat = cv2.imread(frame_path + '_heatMat .jpg', cv2.IMREAD_UNCHANGED)
+        pafMat = cv2.imread(frame_path + '_heatMat.jpg', cv2.IMREAD_UNCHANGED)
         heatMat =cv2.imread(frame_path + '_pafMat.jpg', cv2.IMREAD_UNCHANGED)
         map_coll = [im, flow_1, flow_2, pafMat, heatMat]
         for tensor in map_coll:
