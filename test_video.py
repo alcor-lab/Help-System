@@ -174,7 +174,7 @@ def test():
                                 cv2.putText(im, text ,(10,120),1,1,color,2, bottomLeftOrgin=True)
                                 text = 'Help: '+ obj + ' ' + str(obj_prob)
                                 cv2.putText(im, text ,(10,90),1,1,color,2, bottomLeftOrgin=True)
-                                text = 'Help: ' + place + '' ' + str(place_prob) 
+                                text = 'Help: ' + place + ' ' + str(place_prob) 
                                 cv2.putText(im, text ,(10,60),1,1,color,2, bottomLeftOrgin=True)
                                 
                                 if now_word == now_target:
