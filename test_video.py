@@ -147,12 +147,6 @@ def test():
                         second_matrix = net.compound_second_frames(one_input)
                         second_collection.append(second_matrix)
                         vers2_collection.append(vers2_matrix)
-                        print(one_input.shape)
-                        print(second_matrix.shape)
-                        print(vers2_matrix.shape)
-                        print(np.array_equal(one_input, second_matrix))
-                        print(np.array_equal(one_input, vers2_matrix))
-                        print(np.array_equal(vers2_matrix, second_matrix))
 
                         for seq in range(second_matrix.shape[0]):
                                 cv2.imwrite('test_pic/'+ '_' +str(s)+ '_' +str(seq)+ '_'+str('prep')+ '_rgb.jpg',second_matrix[seq, :, :, :3])
@@ -236,7 +230,6 @@ def test():
                                 if help_label == help_word:
                                         correct_help_v2 += 1
 
-                                print('\n')
                                 print(' ', now_word, c3d_word, next_word, action, obj, place)
                                 print('prep ', float(correct_now)/(s+1), float(correct_c3d)/(s+1), float(correct_next)/(s+1), float(correct_help)/(s+1))
                                 print('stan ', float(correct_now_v2)/(s+1), float(correct_c3d_v2)/(s+1), float(correct_next_v2)/(s+1), float(correct_help_v2)/(s+1))
