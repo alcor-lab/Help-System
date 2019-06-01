@@ -183,8 +183,8 @@ class activity_network:
         if shape_pafMat[0] != config.op_input_height:
             pafMat = cv2.resize(pafMat, dsize=(config.out_H, config.out_W), interpolation=cv2.INTER_CUBIC)
         frame[..., :3] = img
-        frame[..., 3] = pafMat
-        frame[..., 4] = heatMat
+        frame[..., 3] = heatMat
+        frame[..., 4] = pafMat
         frame[..., 5:7] = flow
         frame = frame.astype(np.uint8)
         return frame
