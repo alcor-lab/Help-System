@@ -45,6 +45,19 @@ def im_write_im_read_trick(frame_matrix):
         cv2.imwrite('temp/' + '_flow_2.jpg',frame_matrix[:, :, 6])
         cv2.imwrite('temp/' + '_pafMat.jpg',frame_matrix[:, :, 3])
         cv2.imwrite('temp/' + '_heatMat.jpg',frame_matrix[:, :, 4])
+        im = cv2.imread('temp/' + '_rgb.jpg', cv2.IMREAD_UNCHANGED)
+        flow_1 = cv2.imread('temp/' + '_flow_1.jpg', cv2.IMREAD_UNCHANGED)
+        flow_2 = cv2.imread('temp/' + '_flow_2.jpg', cv2.IMREAD_UNCHANGED)
+        pafMat = cv2.imread('temp/' + '_pafMat.jpg', cv2.IMREAD_UNCHANGED)
+        heatMat =cv2.imread('temp/' + '_heatMat.jpg', cv2.IMREAD_UNCHANGED)
+        frame_matrix[:, :, :3] = cv2.normalize(im, None, 0, 255, cv2.NORM_MINMAX)
+        frame_matrix[:, :, 5] = cv2.normalize(flow_1, None, 0, 255, cv2.NORM_MINMAX)
+        frame_matrix[:, :, 6] = cv2.normalize(flow_2, None, 0, 255, cv2.NORM_MINMAX)
+        frame_matrix[:, :, 3] = cv2.normalize(pafMat, None, 0, 255, cv2.NORM_MINMAX)
+        frame_matrix[:, :, 4] = cv2.normalize(heatMat, None, 0, 255, cv2.NORM_MINMAX)
+        resized = cv2.resize(frame_matrix, dsize=(config.out_H, config.out_W), interpolation=cv2.INTER_CUBIC)
+        resized = resized.astype(np.uint8)
+        return resized
 
 def test():
         prep_dataset = prep_dataset_man.prep_dataset()
@@ -127,7 +140,8 @@ def test():
                                         flow = net.compute_optical_flow(im, im_prev)
                                         pafMat, heatMat = net.compute_pose(im)
                                         frame_processed = net.compound_channel(im, flow, heatMat, pafMat)
-                                        frames_collection.append(frame_processed)
+                                        frame_processed_trick = im_write_im_read_trick(frame_processed)
+                                        frames_collection.append(frame_processed_trick)
                         
                         vers2_matrix = net.compound_second_frames(frames_collection)
                         second_matrix = net.compound_second_frames(one_input)
