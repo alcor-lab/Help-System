@@ -35,10 +35,6 @@ import config
 import pprint
 pp = pprint.PrettyPrinter(indent=4)
 
-# from network_seq import activity_network
-# from network_seq import Training
-# from network_seq import Input_manager
-
 def get_available_gpus():
     local_device_protos = device_lib.list_local_devices()
     return [x for x in local_device_protos if x.device_type == 'GPU']
@@ -55,55 +51,10 @@ class activity_network:
         # load architecture in graph and weights in session and initialize
 
         self.graph = tf.get_default_graph()
-        # self.architecture = tf.train.import_meta_graph('model/activity_network_model.ckpt.meta')
-        # self.latest_ckp = tf.train.latest_checkpoint('model')
+        self.architecture = tf.train.import_meta_graph('model/activity_network_model.ckpt.meta')
+        self.latest_ckp = tf.train.latest_checkpoint('model')
 
-        # self.architecture.restore(self.sess, self.latest_ckp)
-
-        # number_of_classes = IO_tool.num_classes
-        # available_gpus = get_available_gpus()
-        # j=0
-        # Net_collection = {}
-        # Input_net = Input_manager(len(available_gpus), IO_tool)
-        # for device in available_gpus:
-        #     with tf.device(device.name):
-        #         print(device.name)
-        #         with tf.variable_scope('Network') as scope:
-        #             if j>0:
-        #                 scope.reuse_variables()
-        #             Net_collection['Network_' + str(j)] = activity_network(number_of_classes, Input_net, j, IO_tool)
-        #             j = j+1
-        # with tf.device(available_gpus[-1].name):
-        # Train_Net = Training(Net_collection, IO_tool)
-        # IO_tool.start_openPose()
-        # train_writer = tf.summary.FileWriter("logdir/train", sess.graph)
-        # val_writer = tf.summary.FileWriter("logdir/val", sess.graph)
-        
-        # IO_tool.openpose.load_openpose_weights()
-        # sess.run(Train_Net.init)
-        # Train_Net.model_saver.restore(sess, tf.train.latest_checkpoint('./checkpoint'))
-
-        # self.architecture = tf.train.import_meta_graph('./checkpoint')
-        self.architecture = tf.train.import_meta_graph('checkpoint/Net_weigths.model-1000000.meta')
-        self.create_graph_log()
-        ckpts = tf.train.latest_checkpoint('./checkpoint')
-        loader = tf.train.Saver()
-        loader.restore(self.sess, ckpts)
-        # self.architecture = tf.train.import_meta_graph('model/activity_network_model.ckpt.meta')
-        # ckpts = tf.train.latest_checkpoint('./checkpoint')
-        # vars_in_checkpoint = tf.train.list_variables(ckpts)
-        # var_rest = []
-        # for el in vars_in_checkpoint:
-        #     var_rest.append(el[0])
-        # variables = tf.contrib.slim.get_variables_to_restore()
-        # var_list = [v for v in variables if v.name.split(':')[0] in var_rest]
-        # loader = tf.train.Saver(var_list=var_list)
-        # loader.restore(self.sess, ckpts)
-
-        # self.saver = self.graph.get_tensor_by_name("Saver_and_Loader/whole_saver/saver:0")
-        # self.saver.restore(self.sess, self.latest_ckp )
-
-        # tf.saved_model.loader.load(self.sess, export_dir = 'model/activity_network_model.ckpt.meta')
+        architecture.restore(self.sess, ckpts)
 
         # Show progress bar to visualize datasets creation
         self.use_pbar = True
@@ -124,11 +75,8 @@ class activity_network:
         self.now_softmax = self.graph.get_tensor_by_name("Network/Activity_Recognition_Network/Now_Decoder_inference/softmax_out:0")
         self.help_softmax = self.graph.get_tensor_by_name("Network/Activity_Recognition_Network/Help_Decoder_inference/softmax_out:0")
         self.next_softmax = self.graph.get_tensor_by_name("Network/Activity_Recognition_Network/Next_classifier/softmax_out:0")
-        # self.c_out = self.graph.get_tensor_by_name("Network/Activity_Recognition_Network/Lstm_encoder/c_out:0")
-        # self.h_out = self.graph.get_tensor_by_name("Network/Activity_Recognition_Network/Lstm_encoder/h_out:0")
-        self.c_out = self.graph.get_tensor_by_name("Network/Activity_Recognition_Network/Lstm_encoder/concat_2:0")
-        self.h_out = self.graph.get_tensor_by_name("Network/Activity_Recognition_Network/Lstm_encoder/concat_3:0")
-        self.fake_now_label = self.graph.get_tensor_by_name('Inputs/Target/now_label:0')
+        self.c_out = self.graph.get_tensor_by_name("Network/Activity_Recognition_Network/Lstm_encoder/c_out:0")
+        self.h_out = self.graph.get_tensor_by_name("Network/Activity_Recognition_Network/Lstm_encoder/h_out:0")
         self.empyt_labels = np.zeros(shape=(4, 1,config.seq_len + 1), dtype=int)
 
     def create_graph_log(self):
@@ -164,7 +112,6 @@ class activity_network:
         pafMat = cv2.resize(pafMat, dsize=(config.out_H, config.out_W), interpolation=cv2.INTER_CUBIC)
         norm_pafMat = cv2.normalize(pafMat, None, 0, 255, cv2.NORM_MINMAX)
 
-        # pafMat, heatMat = self.IO_tool.openpose.compute_pose_frame(img)
         return norm_pafMat, norm_heatMat
 
     def compound_channel(self, img, flow, heatMat, pafMat):
@@ -183,8 +130,8 @@ class activity_network:
         if shape_pafMat[0] != config.op_input_height:
             pafMat = cv2.resize(pafMat, dsize=(config.out_H, config.out_W), interpolation=cv2.INTER_CUBIC)
         frame[..., :3] = img
-        frame[..., 3] = pafMat
-        frame[..., 4] = heatMat
+        frame[..., 3] = heatMat
+        frame[..., 4] = pafMat
         frame[..., 5:7] = flow
         frame = frame.astype(np.uint8)
         return frame
@@ -259,15 +206,6 @@ class activity_network:
     def compute_activity_given_tensor(self, tensor, second_count):     
         # compute results from network given tensor and last second time count 
         c, h =self.retrieve_hidden_state(second_count)
-
-        # for seq in range(tensor.shape[2]):
-        #     for frame in range(tensor.shape[3]):
-        #         cv2.imwrite('test_pic/'+str(second_count)+ '_' +str(seq)+ '_' +str(frame)+ '_'+ '_rgb.jpg',tensor[0,0,seq,frame, :, :, :3])
-                # cv2.imwrite('test_pic/'+str(second_count) +str(seq) +str(frame) + '_flow_1.jpg',tensor[0,0,seq,frame, :, :, 5])
-                # cv2.imwrite('test_pic/'+str(second_count) +str(seq) +str(frame) + '_flow_2.jpg',tensor[0,0,seq,frame, :, :, 6])
-                # cv2.imwrite('test_pic/'+str(second_count) +str(seq) +str(frame) + '_pafMat.jpg',tensor[0,0,seq,frame, :, :, 3])
-                # cv2.imwrite('test_pic/'+str(second_count) +str(seq) +str(frame) + '_heatMat.jpg',tensor[0,0,seq,frame, :, :, 4])
-
 
         now_softmax, help_softmax, next_softmax, c3d_softmax, c_out, h_out = self.sess.run([self.now_softmax, self.help_softmax, self.next_softmax, self.c3d_softmax,
                                                                                 self.c_out, self.h_out],
