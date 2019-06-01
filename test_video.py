@@ -39,26 +39,6 @@ def extract_preprocessed_one_input(video_path, segment, prep_dataset):
         frame_list = extracted_frames.keys()
         return one_input, frame_list
 
-def im_write_im_read_trick(frame_matrix):
-        cv2.imwrite('temp/' + '_rgb.jpg',frame_matrix[:, :, :3])
-        cv2.imwrite('temp/' + '_flow_1.jpg',frame_matrix[:, :, 5])
-        cv2.imwrite('temp/' + '_flow_2.jpg',frame_matrix[:, :, 6])
-        cv2.imwrite('temp/' + '_pafMat.jpg',frame_matrix[:, :, 3])
-        cv2.imwrite('temp/' + '_heatMat.jpg',frame_matrix[:, :, 4])
-        im = cv2.imread('temp/' + '_rgb.jpg', cv2.IMREAD_UNCHANGED)
-        flow_1 = cv2.imread('temp/' + '_flow_1.jpg', cv2.IMREAD_UNCHANGED)
-        flow_2 = cv2.imread('temp/' + '_flow_2.jpg', cv2.IMREAD_UNCHANGED)
-        pafMat = cv2.imread('temp/' + '_pafMat.jpg', cv2.IMREAD_UNCHANGED)
-        heatMat =cv2.imread('temp/' + '_heatMat.jpg', cv2.IMREAD_UNCHANGED)
-        frame_matrix[:, :, :3] = cv2.normalize(im, None, 0, 255, cv2.NORM_MINMAX)
-        frame_matrix[:, :, 5] = cv2.normalize(flow_1, None, 0, 255, cv2.NORM_MINMAX)
-        frame_matrix[:, :, 6] = cv2.normalize(flow_2, None, 0, 255, cv2.NORM_MINMAX)
-        frame_matrix[:, :, 3] = cv2.normalize(pafMat, None, 0, 255, cv2.NORM_MINMAX)
-        frame_matrix[:, :, 4] = cv2.normalize(heatMat, None, 0, 255, cv2.NORM_MINMAX)
-        resized = cv2.resize(frame_matrix, dsize=(config.out_H, config.out_W), interpolation=cv2.INTER_CUBIC)
-        resized = resized.astype(np.uint8)
-        return resized
-
 def test():
         prep_dataset = prep_dataset_man.prep_dataset()
         net = activity_network.activity_network()
@@ -140,25 +120,13 @@ def test():
                                         flow = net.compute_optical_flow(im, im_prev)
                                         pafMat, heatMat = net.compute_pose(im)
                                         frame_processed = net.compound_channel(im, flow, heatMat, pafMat)
-                                        frame_processed_trick = im_write_im_read_trick(frame_processed)
-                                        frames_collection.append(frame_processed_trick)
+                                        frames_collection.append(frame_processed)
                         
                         vers2_matrix = net.compound_second_frames(frames_collection)
                         second_matrix = net.compound_second_frames(one_input)
                         second_collection.append(second_matrix)
                         vers2_collection.append(vers2_matrix)
 
-                        for seq in range(second_matrix.shape[0]):
-                                cv2.imwrite('test_pic/'+ '_' +str(s)+ '_' +str(seq)+ '_'+str('prep')+ '_rgb.jpg',second_matrix[seq, :, :, :3])
-                                cv2.imwrite('test_pic/'+ '_' +str(s)+ '_' +str(seq)+ '_'+str('v2')+ '_rgb.jpg',vers2_matrix[seq, :, :, :3])
-                                cv2.imwrite('test_pic/'+ '_' +str(s)+ '_' +str(seq)+ '_'+str('prep')+ '_flow_1.jpg',second_matrix[seq, :, :, 5])
-                                cv2.imwrite('test_pic/'+ '_' +str(s)+ '_' +str(seq)+ '_'+str('v2')+ '_flow_1.jpg',vers2_matrix[seq, :, :, 5])
-                                cv2.imwrite('test_pic/'+ '_' +str(s)+ '_' +str(seq)+ '_'+str('prep')+ '_flow_2.jpg',second_matrix[seq, :, :, 6])
-                                cv2.imwrite('test_pic/'+ '_' +str(s)+ '_' +str(seq)+ '_'+str('v2')+ '_flow_2.jpg',vers2_matrix[seq, :, :, 6])
-                                cv2.imwrite('test_pic/'+ '_' +str(s)+ '_' +str(seq)+ '_'+str('prep')+ '_pafMat.jpg',second_matrix[seq, :, :, 3])
-                                cv2.imwrite('test_pic/'+ '_' +str(s)+ '_' +str(seq)+ '_'+str('v2')+ '_pafMat.jpg',vers2_matrix[seq, :, :, 3])
-                                cv2.imwrite('test_pic/'+ '_' +str(s)+ '_' +str(seq)+ '_'+str('prep')+ '_heatMat.jpg',second_matrix[seq, :, :, 4])
-                                cv2.imwrite('test_pic/'+ '_' +str(s)+ '_' +str(seq)+ '_'+str('v2')+ '_heatMat.jpg',vers2_matrix[seq, :, :, 4])
                         if s >= 3:
                                 # V1
                                 input_sec = second_collection[-4:]
