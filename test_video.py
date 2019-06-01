@@ -98,27 +98,34 @@ def test():
                         frames_collection = []
                         segment = [int(linspace_frame[0]), int(linspace_frame[-1])+1]
                         one_input, frame_list = extract_preprocessed_one_input(path, segment, prep_dataset)
-                        # for frame in range(int(linspace_frame[0]), int(linspace_frame[-1])+1):
-                        #         video.set(1, frame)
-                        #         ret, im = video.read()
-                        #         extracted_frames[frame] = im
-                        #         frame = int(frame)
-                        #         frame_prev = frame - 1
-                        #         if frame in linspace_frame:
-                        #                 if frame_prev in extracted_frames:
-                        #                         im_prev = extracted_frames[frame_prev]
-                        #                 else:
-                        #                         video.set(1, frame_prev)
-                        #                         ret, im_prev = video.read()
-                        #                         extracted_frames[frame_prev] = im_prev
+                        for frame in range(int(linspace_frame[0]), int(linspace_frame[-1])+1):
+                                video.set(1, frame)
+                                ret, im = video.read()
+                                extracted_frames[frame] = im
+                                frame = int(frame)
+                                frame_prev = frame - 1
+                                if frame in linspace_frame:
+                                        if frame_prev in extracted_frames:
+                                                im_prev = extracted_frames[frame_prev]
+                                        else:
+                                                video.set(1, frame_prev)
+                                                ret, im_prev = video.read()
+                                                extracted_frames[frame_prev] = im_prev
 
-                        #                 flow = net.compute_optical_flow(im, im_prev)
-                        #                 pafMat, heatMat = net.compute_pose(im)
-                        #                 frame_processed = net.compound_channel(im, flow, heatMat, pafMat)
-                        #                 frames_collection.append(frame_processed)
-                                
-                        # second_matrix = net.compound_second_frames(one_input)
-                        second_collection.append(one_input)
+                                        flow = net.compute_optical_flow(im, im_prev)
+                                        pafMat, heatMat = net.compute_pose(im)
+                                        frame_processed = net.compound_channel(im, flow, heatMat, pafMat)
+                                        frames_collection.append(frame_processed)
+                        
+                        vers2_matrix = net.compound_second_frames(frames_collection)
+                        second_matrix = net.compound_second_frames(one_input)
+                        second_collection.append(second_matrix)
+                        print(one_input.shape)
+                        print(second_matrix.shape)
+                        print(vers2_matrix.shape)
+                        print(numpy.array_equal(one_input, second_matrix))
+                        print(numpy.array_equal(one_input, vers2_matrix))
+                        print(numpy.array_equal(vers2_matrix, second_matrix))
                         if s >= 3:
                                 input_sec = second_collection[-4:]
                                 now_softmax, next_softmax, help_softmax, c3d_softmax = net.compute_activity_given_seconds_matrix(input_sec, s)
