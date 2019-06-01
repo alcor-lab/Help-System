@@ -98,7 +98,9 @@ def test():
                         
                         second_matrix = net.compound_second_frames(frames_collection)
                         second_collection.append(second_matrix)
-
+                        now_target = id_to_label[ordered_collection[path][s]['now_label']]
+                        next_label = id_to_label[ordered_collection[path][s]['next_label']]
+                        help_label = id_to_label[ordered_collection[path][s]['help']]
                         if s >= 3:
                                 input_sec = second_collection[-4:]
                                 now_softmax, next_softmax, help_softmax, c3d_softmax = net.compute_activity_given_seconds_matrix(input_sec, s)
@@ -139,9 +141,7 @@ def test():
 
                                 help_word = action + ' ' + obj + ' ' + place
 
-                                now_target = id_to_label[ordered_collection[path][s-config.seq_len+1]['now_label']]
-                                next_label = id_to_label[ordered_collection[path][s]['next_label']]
-                                help_label = id_to_label[ordered_collection[path][s]['help']]
+                                
                                 if now_word == now_target:
                                         correct_now += 1
                                 if c3d_word == now_target:
