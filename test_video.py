@@ -42,7 +42,7 @@ def extract_preprocessed_one_input(video_path, segment, prep_dataset):
 def test():
         prep_dataset = prep_dataset_man.prep_dataset()
         net = activity_network.activity_network()
-        test_collection = load('train_collection')
+        test_collection = load('test_collection')
         id_to_word = load('id_to_word')
         id_to_label = load('id_to_label')
         ordered_collection = load('ordered_collection')
