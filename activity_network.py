@@ -155,12 +155,14 @@ class activity_network:
             img = cv2.resize(img, dsize=(config.op_input_height, config.op_input_width), interpolation=cv2.INTER_CUBIC)
         pafMat, heatMat = self.sess.run([self.pose_out_1, self.pose_out_2], feed_dict={'image:0': [img]})
         heatMat, pafMat = heatMat[0], pafMat[0]
+        
         heatMat = np.amax(heatMat, axis=2)
-        pafMat = np.amax(pafMat, axis=2)
         heatMat = cv2.resize(heatMat, dsize=(config.out_H, config.out_W), interpolation=cv2.INTER_CUBIC)
+        norm_heatMat = cv2.normalize(heatMat, None, 0, 255, cv2.NORM_MINMAX)
+
+        pafMat = np.amax(pafMat, axis=2)
         pafMat = cv2.resize(pafMat, dsize=(config.out_H, config.out_W), interpolation=cv2.INTER_CUBIC)
         norm_pafMat = cv2.normalize(pafMat, None, 0, 255, cv2.NORM_MINMAX)
-        norm_heatMat = cv2.normalize(heatMat, None, 0, 255, cv2.NORM_MINMAX)
 
         # pafMat, heatMat = self.IO_tool.openpose.compute_pose_frame(img)
         return norm_pafMat, norm_heatMat
