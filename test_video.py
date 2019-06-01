@@ -6,8 +6,6 @@ import cv2
 import numpy as np
 import os
 from tqdm import tqdm
-import prep_dataset_manager
-import prep_dataset_manager as prep_dataset_man
 
 pp = pprint.PrettyPrinter(indent=4)
 
@@ -19,28 +17,7 @@ def load(name):
     with open('dataset/' + name + '.pkl', 'rb') as f:
         return pickle.load(f)
 
-def extract_preprocessed_one_input(video_path, segment, prep_dataset):
-        one_input = np.zeros(shape=(config.frames_per_step, config.out_H, config.out_W, 7), dtype=np.uint8)
-        extracted_frames = {}
-        frame_list = []
-        try:
-            linspace_frame = np.linspace(segment[0], segment[1], num=config.frames_per_step)
-            z = 0
-            for frame in linspace_frame:
-                try:
-                    one_input[z, :, :, :] = prep_dataset.get_matrix(video_path, frame)
-                    z += 1
-                except Exception as e:
-                    print(e)
-                    pass
-        except Exception as e:
-            print(e)
-            pass
-        frame_list = extracted_frames.keys()
-        return one_input, frame_list
-
 def test():
-        prep_dataset = prep_dataset_man.prep_dataset()
         net = activity_network.activity_network()
         test_collection = load('train_collection')
         id_to_word = load('id_to_word')
@@ -58,6 +35,8 @@ def test():
 
         pbar_video = tqdm(total=len(path_collection), leave=False, desc='Videos')
 
+        RED_COLOR = (255,0,0)
+        GREEN_COLOR = (0,255,0)
         for path in path_collection:
                 net.hidden_states_collection = {}
                 output_collection[path] = {}
@@ -85,10 +64,6 @@ def test():
                 correct_c3d = 0
                 correct_next = 0
                 correct_help = 0
-                correct_now_v2 = 0
-                correct_c3d_v2 = 0
-                correct_next_v2 = 0
-                correct_help_v2= 0
                 for s in range(seconds):
                         
                         linspace_frame = np.linspace(s*fps+1, (s+1)*fps+1, num=config.frames_per_step)
@@ -102,7 +77,6 @@ def test():
                         z = 0
                         frames_collection = []
                         segment = [int(linspace_frame[0]), int(linspace_frame[-1])+1]
-                        one_input, frame_list = extract_preprocessed_one_input(path, segment, prep_dataset)
                         for frame in range(int(linspace_frame[0]), int(linspace_frame[-1])+1):
                                 video.set(1, frame)
                                 ret, im = video.read()
@@ -122,33 +96,49 @@ def test():
                                         frame_processed = net.compound_channel(im, flow, heatMat, pafMat)
                                         frames_collection.append(frame_processed)
                         
-                        vers2_matrix = net.compound_second_frames(frames_collection)
-                        second_matrix = net.compound_second_frames(one_input)
+                        second_matrix = net.compound_second_frames(frames_collection)
                         second_collection.append(second_matrix)
-                        vers2_collection.append(vers2_matrix)
 
                         if s >= 3:
-                                # V1
                                 input_sec = second_collection[-4:]
                                 now_softmax, next_softmax, help_softmax, c3d_softmax = net.compute_activity_given_seconds_matrix(input_sec, s)
+
                                 output_collection[path][s] = {}
                                 output_collection[path][s]['now_softmax'] = now_softmax
                                 output_collection[path][s]['next_softmax'] = next_softmax
                                 output_collection[path][s]['help_softmax'] = help_softmax
                                 output_collection[path][s]['c3d_softmax'] = c3d_softmax
+
                                 now_word = now_softmax[-1,:]
                                 c3d_word = c3d_softmax[-1,:]
                                 next_word =next_softmax[-1,:]
                                 action = help_softmax[0,:]
                                 obj = help_softmax[1,:]
                                 place = help_softmax[2,:]
-                                now_word = id_to_word[np.argmax(now_word, axis=0)]
-                                c3d_word = id_to_word[np.argmax(c3d_word, axis=0)]
-                                next_word = id_to_word[np.argmax(next_word, axis=0)]
-                                action = id_to_word[np.argmax(action, axis=0)]
-                                obj = id_to_word[np.argmax(obj, axis=0)]
-                                place = id_to_word[np.argmax(place, axis=0)]
+
+                                now_word_max = np.argmax(now_word, axis=0)
+                                c3d_word_max = np.argmax(c3d_word, axis=0)
+                                next_word_max = np.argmax(next_word, axis=0)
+                                action_max = np.argmax(action, axis=0)
+                                obj_max = np.argmax(obj, axis=0)
+                                place_max = np.argmax(place, axis=0)
+
+                                now_prob = now_word[now_word_max]
+                                c3d_prob = now_word[c3d_word_max]
+                                next_prob = now_word[next_word_max]
+                                action_prob = now_word[action_max]
+                                obj_prob = now_word[obj_max]
+                                place_prob = now_word[place_max]
+
+                                now_word = id_to_word[now_word_max]
+                                c3d_word = id_to_word[c3d_word_max]
+                                next_word = id_to_word[next_word_max]
+                                action = id_to_word[action_max]
+                                obj = id_to_word[obj_max]
+                                place = id_to_word[place_max]
+
                                 help_word = action + ' ' + obj + ' ' + place
+
                                 now_target = id_to_label[ordered_collection[path][s-config.seq_len+1]['now_label']]
                                 next_label = id_to_label[ordered_collection[path][s]['next_label']]
                                 help_label = id_to_label[ordered_collection[path][s]['help']]
@@ -161,57 +151,38 @@ def test():
                                 if help_label == help_word:
                                         correct_help += 1
 
-                                print('\n')
-                                print(' ', now_target, now_target, next_label, help_label)
-                                print(' ', now_word, c3d_word, next_word, action, obj, place)
-
-                                # V2
-                                input_sec = vers2_collection[-4:]
-                                now_softmax, next_softmax, help_softmax, c3d_softmax = net.compute_activity_given_seconds_matrix(input_sec, s)
-                                output_collection[path][s] = {}
-                                output_collection[path][s]['now_softmax'] = now_softmax
-                                output_collection[path][s]['next_softmax'] = next_softmax
-                                output_collection[path][s]['help_softmax'] = help_softmax
-                                output_collection[path][s]['c3d_softmax'] = c3d_softmax
-                                now_word = now_softmax[-1,:]
-                                c3d_word = c3d_softmax[-1,:]
-                                next_word =next_softmax[-1,:]
-                                action = help_softmax[0,:]
-                                obj = help_softmax[1,:]
-                                place = help_softmax[2,:]
-                                now_word = id_to_word[np.argmax(now_word, axis=0)]
-                                c3d_word = id_to_word[np.argmax(c3d_word, axis=0)]
-                                next_word = id_to_word[np.argmax(next_word, axis=0)]
-                                action = id_to_word[np.argmax(action, axis=0)]
-                                obj = id_to_word[np.argmax(obj, axis=0)]
-                                place = id_to_word[np.argmax(place, axis=0)]
-                                help_word = action + ' ' + obj + ' ' + place
-                                now_target = id_to_label[ordered_collection[path][s-config.seq_len+1]['now_label']]
-                                next_label = id_to_label[ordered_collection[path][s]['next_label']]
-                                help_label = id_to_label[ordered_collection[path][s]['help']]
-                                if now_word == now_target:
-                                        correct_now_v2 += 1
-                                if c3d_word == now_target:
-                                        correct_c3d_v2 += 1
-                                if next_label == next_word:
-                                        correct_next_v2 += 1
-                                if help_label == help_word:
-                                        correct_help_v2 += 1
-
-                                print(' ', now_word, c3d_word, next_word, action, obj, place)
-                                print('prep ', float(correct_now)/(s+1), float(correct_c3d)/(s+1), float(correct_next)/(s+1), float(correct_help)/(s+1))
-                                print('stan ', float(correct_now_v2)/(s+1), float(correct_c3d_v2)/(s+1), float(correct_next_v2)/(s+1), float(correct_help_v2)/(s+1))
+                                # print('\n')
+                                # print(' ', now_target, now_target, next_label, help_label)
+                                # print(' ', now_word, c3d_word, next_word, action, obj, place)
+                                # print('prep ', float(correct_now)/(s+1), float(correct_c3d)/(s+1), float(correct_next)/(s+1), float(correct_help)/(s+1))
                         
                         for frame in range(s*fps+1, (s+1)*fps+1):
                                 video.set(1, frame)
                                 ret, im = video.read()
-                                text = 'Now: ' + now_word + '. Next: ' + next_word 
-                                cv2.putText(im, text ,(10,10),1,1,(255,255,255))
-                                text = 'Help: ' + action + ' ' + obj + ' ' + place 
-                                cv2.putText(im, text ,(20,20),1,1,(255,255,255))
+
+                                if help_label == help_word:
+                                        color = GREEN_COLOR
+                                else:
+                                        color = RED_COLOR
+                                text = 'Help: ' + action + ' ' + obj + ' ' + place + ' ' + str(action_prob) + ' ' + str(obj_prob) + ' ' + str(place_prob) 
+                                cv2.putText(im, text ,(10,10),1,1,color)
+                                
+                                if now_word == now_target:
+                                        color = GREEN_COLOR
+                                else:
+                                        color = RED_COLOR
+                                text = 'Now: ' + now_word + ' ' + str(now_prob) 
+                                cv2.putText(im, text ,(30,10),1,1,color)
+
+                                if next_label == next_word:
+                                        color = GREEN_COLOR
+                                else:
+                                        color = RED_COLOR
+                                text = 'Next: ' + next_word + ' ' + str(next_prob)
+                                cv2.putText(im, text ,(60,10),1,1,color)
                                 out.write(im)
                         
-                        # pbar_second.update(1)
+                        pbar_second.update(1)
                 pbar_second.refresh()
                 pbar_second.clear()
                 pbar_second.close()
