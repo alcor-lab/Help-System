@@ -177,25 +177,25 @@ def test():
                                 else:
                                         color = RED_COLOR
                                 text = 'Help: ' + action + ' ' + str(action_prob) 
-                                cv2.putText(im, text ,(10,120),1,font_scale,color,thickness, bottomLeftOrigin=False)
+                                cv2.putText(im, text ,(10,20),1,font_scale,color,thickness, bottomLeftOrigin=False)
                                 text = 'Help: '+ obj + ' ' + str(obj_prob)
-                                cv2.putText(im, text ,(10,90),1,font_scale,color,thickness, bottomLeftOrigin=False)
+                                cv2.putText(im, text ,(10,50),1,font_scale,color,thickness, bottomLeftOrigin=False)
                                 text = 'Help: ' + place + ' ' + str(place_prob) 
-                                cv2.putText(im, text ,(10,60),1,font_scale,color,thickness, bottomLeftOrigin=False)
+                                cv2.putText(im, text ,(10,80),1,font_scale,color,thickness, bottomLeftOrigin=False)
                                 
                                 if now_word == now_target:
                                         color = GREEN_COLOR
                                 else:
                                         color = RED_COLOR
                                 text = 'Now: ' + now_word + ' ' + str(now_prob) 
-                                cv2.putText(im, text ,(10,30),1,font_scale,color,thickness, bottomLeftOrigin=False)
+                                cv2.putText(im, text ,(10,110),1,font_scale,color,thickness, bottomLeftOrigin=False)
 
                                 if next_label == next_word:
                                         color = GREEN_COLOR
                                 else:
                                         color = RED_COLOR
                                 text = 'Next: ' + next_word + ' ' + str(next_prob)
-                                cv2.putText(im, text ,(10,10),1,font_scale,color,thickness, bottomLeftOrigin=False)
+                                cv2.putText(im, text ,(10,140),1,font_scale,color,thickness, bottomLeftOrigin=False)
                                 
 
                                 out.write(im)
