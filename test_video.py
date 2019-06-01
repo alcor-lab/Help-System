@@ -136,9 +136,9 @@ def test():
                                 now_prob = now_word[now_word_max]
                                 c3d_prob = now_word[c3d_word_max]
                                 next_prob = next_word[next_word_max]
-                                action_prob = now_word[action_max]
-                                obj_prob = now_word[obj_max]
-                                place_prob = now_word[place_max]
+                                action_prob = action[action_max]
+                                obj_prob = obj[obj_max]
+                                place_prob = place[place_max]
 
                                 now_word = id_to_word[now_word_max]
                                 c3d_word = id_to_word[c3d_word_max]
