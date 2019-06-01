@@ -132,6 +132,14 @@ def test():
                         print(np.array_equal(one_input, second_matrix))
                         print(np.array_equal(one_input, vers2_matrix))
                         print(np.array_equal(vers2_matrix, second_matrix))
+
+                        for seq in range(second_matrix.shape[0]):
+                                cv2.imwrite('test_pic/'+ '_' +str(s)+ '_' +str(seq)+ '_'+str('prep')+ '_rgb.jpg',second_matrix[seq, :, :, :3])
+                                cv2.imwrite('test_pic/'+ '_' +str(s)+ '_' +str(seq)+ '_'+str('v2')+ '_rgb.jpg',vers2_matrix[seq, :, :, :3])
+                                # cv2.imwrite('test_pic/'+str(second_count) +str(seq) +str(frame) + '_flow_1.jpg',tensor[0,0,seq,frame, :, :, 5])
+                                # cv2.imwrite('test_pic/'+str(second_count) +str(seq) +str(frame) + '_flow_2.jpg',tensor[0,0,seq,frame, :, :, 6])
+                                # cv2.imwrite('test_pic/'+str(second_count) +str(seq) +str(frame) + '_pafMat.jpg',tensor[0,0,seq,frame, :, :, 3])
+                                # cv2.imwrite('test_pic/'+str(second_count) +str(seq) +str(frame) + '_heatMat.jpg',tensor[0,0,seq,frame, :, :, 4])
                         if s >= 3:
                                 # V1
                                 input_sec = second_collection[-4:]
