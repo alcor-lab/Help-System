@@ -167,6 +167,7 @@ def test():
                         for frame in range(s*fps+1, (s+1)*fps+1):
                                 video.set(1, frame)
                                 ret, im = video.read()
+                                resized = cv2.resize(frame_matrix, dsize=(out_width, out_height), interpolation=cv2.INTER_CUBIC)
 
                                 if help_label == help_word:
                                         color = GREEN_COLOR
@@ -193,7 +194,6 @@ def test():
                                 text = 'Next: ' + next_word + ' ' + str(next_prob)
                                 cv2.putText(im, text ,(10,10),1,1,color,2, bottomLeftOrigin=False)
                                 
-                                resized = cv2.resize(frame_matrix, dsize=(out_width, out_height), interpolation=cv2.INTER_CUBIC)
 
                                 out.write(im)
                         
