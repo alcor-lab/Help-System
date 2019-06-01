@@ -37,7 +37,7 @@ class prep_dataset:
         #     print('ERROR LOADING heatMat')
         frame_matrix = np.zeros(shape=(368, 368, 7), dtype=np.uint8)
         frame_matrix[:, :, :3] = cv2.normalize(im, None, 0, 255, cv2.NORM_MINMAX)
-        # frame_matrix[:, :, 5] = cv2.normalize(flow_1, None, 0, 255, cv2.NORM_MINMAX)
+        frame_matrix[:, :, 5] = cv2.normalize(flow_1, None, 0, 255, cv2.NORM_MINMAX)
         # frame_matrix[:, :, 6] = cv2.normalize(flow_2, None, 0, 255, cv2.NORM_MINMAX)
         # frame_matrix[:, :, 3] = cv2.normalize(pafMat, None, 0, 255, cv2.NORM_MINMAX)
         # frame_matrix[:, :, 4] = cv2.normalize(heatMat, None, 0, 255, cv2.NORM_MINMAX)
