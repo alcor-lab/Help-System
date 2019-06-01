@@ -137,7 +137,7 @@ def test():
                                 print(' ', now_target, now_target, next_label, help_label)
                                 print(' ', float(correct_now)/(s+1), float(correct_c3d)/(s+1), float(correct_next)/(s+1), float(correct_help)/(s+1))
                         
-                        for frame in range(s*fps+1, (s+1)*fps+1)
+                        for frame in range(s*fps+1, (s+1)*fps+1):
                                 video.set(1, frame)
                                 ret, im = video.read()
                                 text = 'Now: ' + now_word + '. Next: ' + next_word 
