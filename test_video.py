@@ -50,10 +50,12 @@ def test():
                 pbar_second = tqdm(total=seconds, leave=False, desc='seconds')
                 width = int(video.get(cv2.CAP_PROP_FRAME_WIDTH))
                 height = int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))
+                out_width = width*2
+                out_height = height*2
                 fourcc = cv2.VideoWriter_fourcc(*'XVID')
                 fourcc = cv2.VideoWriter_fourcc(*'MPEG')
                 fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-                out = cv2.VideoWriter('dataset/results/'+ path.split('/')[-1],fourcc, fps, (width,height))
+                out = cv2.VideoWriter('dataset/results/'+ path.split('/')[-1],fourcc, fps, (out_width,out_height))
         
                 now_word = ''
                 next_word = ''
@@ -190,6 +192,9 @@ def test():
                                         color = RED_COLOR
                                 text = 'Next: ' + next_word + ' ' + str(next_prob)
                                 cv2.putText(im, text ,(10,10),1,1,color,2, bottomLeftOrigin=False)
+                                
+                                resized = cv2.resize(frame_matrix, dsize=(out_width, out_height), interpolation=cv2.INTER_CUBIC)
+
                                 out.write(im)
                         
                         pbar_second.update(1)
