@@ -127,8 +127,8 @@ def test():
                                 output_collection[path][s]['next_softmax'] = next_softmax
                                 output_collection[path][s]['help_softmax'] = help_softmax
                                 output_collection[path][s]['c3d_softmax'] = c3d_softmax
-                                now_word = now_softmax[0,:]
-                                c3d_word = c3d_softmax[0,:]
+                                now_word = now_softmax[-1,:]
+                                c3d_word = c3d_softmax[-1,:]
                                 next_word =next_softmax[-1,:]
                                 action = help_softmax[0,:]
                                 obj = help_softmax[1,:]
