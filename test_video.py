@@ -85,6 +85,10 @@ def test():
                 correct_c3d = 0
                 correct_next = 0
                 correct_help = 0
+                correct_now_v2 = 0
+                correct_c3d_v2 = 0
+                correct_next_v2 = 0
+                correct_help_v2= 0
                 for s in range(seconds):
                         
                         linspace_frame = np.linspace(s*fps+1, (s+1)*fps+1, num=config.frames_per_step)
@@ -192,13 +196,13 @@ def test():
                                 next_label = id_to_label[ordered_collection[path][s]['next_label']]
                                 help_label = id_to_label[ordered_collection[path][s]['help']]
                                 if now_word == now_target:
-                                        correct_now += 1
+                                        correct_now_v2 += 1
                                 if c3d_word == now_target:
-                                        correct_c3d += 1
+                                        correct_c3d_v2 += 1
                                 if next_label == next_word:
-                                        correct_next += 1
+                                        correct_next_v2 += 1
                                 if help_label == help_word:
-                                        correct_help += 1
+                                        correct_help_v2 += 1
 
                                 # print('\n')
                                 # print(' ', now_word, c3d_word, next_word, action, obj, place)
