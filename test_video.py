@@ -175,7 +175,7 @@ def test():
                                 text = 'Help: '+ obj + ' ' + str(obj_prob)
                                 cv2.putText(im, text ,(10,90),1,1,color,2, bottomLeftOrigin=True)
                                 text = 'Help: ' + place + ' ' + str(place_prob) 
-                                cv2.putText(im, text ,(10,60),1,1,color,2, bottomLeftOrgin=True)
+                                cv2.putText(im, text ,(10,60),1,1,color,2, bottomLeftOrigin=True)
                                 
                                 if now_word == now_target:
                                         color = GREEN_COLOR
