@@ -7,7 +7,7 @@ import numpy as np
 import os
 from tqdm import tqdm
 import prep_dataset_manager
-import prep_dataset_manager as prep_dataset
+import prep_dataset_manager as prep_dataset_man
 
 pp = pprint.PrettyPrinter(indent=4)
 
@@ -20,7 +20,7 @@ def load(name):
         return pickle.load(f)
 
 def test():
-        prep_dataset = prep_dataset.prep_dataset()
+        prep_dataset = prep_dataset_man.prep_dataset()
         net = activity_network.activity_network()
         test_collection = load('train_collection')
         id_to_word = load('id_to_word')
