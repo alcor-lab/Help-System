@@ -6,6 +6,9 @@ import cv2
 import numpy as np
 import os
 from tqdm import tqdm
+import prep_dataset_manager
+import prep_dataset_manager as prep_dataset
+
 pp = pprint.PrettyPrinter(indent=4)
 
 def save(obj, name):
@@ -17,6 +20,7 @@ def load(name):
         return pickle.load(f)
 
 def test():
+        prep_dataset = prep_dataset.prep_dataset()
         net = activity_network.activity_network()
         test_collection = load('train_collection')
         id_to_word = load('id_to_word')
@@ -62,7 +66,7 @@ def test():
                 correct_help = 0
                 for s in range(seconds):
                         
-                        linspace_frame = np.linspace(s*fps+2, (s+1)*fps+2, num=config.frames_per_step)
+                        linspace_frame = np.linspace(s*fps+1, (s+1)*fps+1, num=config.frames_per_step)
                         linspace_frame = [int(x) for x in linspace_frame]
                         if (linspace_frame[-1] == (framecount-1)):
                                 linspace_frame[-1] -= 1
@@ -72,33 +76,32 @@ def test():
                         extracted_frames = {}
                         z = 0
                         frames_collection = []
-                        for frame in range(int(linspace_frame[0]), int(linspace_frame[-1])+1):
-                                video.set(1, frame)
-                                ret, im = video.read()
-                                extracted_frames[frame] = im
-                                frame = int(frame)
-                                frame_prev = frame - 1
-                                if frame in linspace_frame:
-                                        if frame_prev in extracted_frames:
-                                                im_prev = extracted_frames[frame_prev]
-                                        else:
-                                                video.set(1, frame_prev)
-                                                ret, im_prev = video.read()
-                                                extracted_frames[frame_prev] = im_prev
+                        segment = [int(linspace_frame[0]), int(linspace_frame[-1])+1]
+                        one_input, frame_list = self.extract_preprocessed_one_input(path, segment, pbar)
+                        # for frame in range(int(linspace_frame[0]), int(linspace_frame[-1])+1):
+                        #         video.set(1, frame)
+                        #         ret, im = video.read()
+                        #         extracted_frames[frame] = im
+                        #         frame = int(frame)
+                        #         frame_prev = frame - 1
+                        #         if frame in linspace_frame:
+                        #                 if frame_prev in extracted_frames:
+                        #                         im_prev = extracted_frames[frame_prev]
+                        #                 else:
+                        #                         video.set(1, frame_prev)
+                        #                         ret, im_prev = video.read()
+                        #                         extracted_frames[frame_prev] = im_prev
 
-                                        flow = net.compute_optical_flow(im, im_prev)
-                                        pafMat, heatMat = net.compute_pose(im)
-                                        frame_processed = net.compound_channel(im, flow, heatMat, pafMat)
-                                        frames_collection.append(frame_processed)
-                                text = 'Now: ' + now_word + '. Next: ' + next_word 
-                                cv2.putText(im, text ,(10,10),1,1,(255,255,255))
-                                text = 'Help: ' + action + ' ' + obj + ' ' + place 
-                                cv2.putText(im, text ,(20,20),1,1,(255,255,255))
-                                out.write(im)
-                        second_matrix = net.compound_second_frames(frames_collection)
+                        #                 flow = net.compute_optical_flow(im, im_prev)
+                        #                 pafMat, heatMat = net.compute_pose(im)
+                        #                 frame_processed = net.compound_channel(im, flow, heatMat, pafMat)
+                        #                 frames_collection.append(frame_processed)
+                                
+                        second_matrix = net.compound_second_frames(one_input)
                         second_collection.append(second_matrix)
                         if s >= 3:
-                                now_softmax, next_softmax, help_softmax, c3d_softmax = net.compute_activity_given_seconds_matrix(second_collection[-4:], s)
+                                input_sec = second_collection[-4:]
+                                now_softmax, next_softmax, help_softmax, c3d_softmax = net.compute_activity_given_seconds_matrix(input_sec, s)
                                 output_collection[path][s] = {}
                                 output_collection[path][s]['now_softmax'] = now_softmax
                                 output_collection[path][s]['next_softmax'] = next_softmax
@@ -133,6 +136,15 @@ def test():
                                 print(' ', now_word, c3d_word, next_word, action, obj, place)
                                 print(' ', now_target, now_target, next_label, help_label)
                                 print(' ', float(correct_now)/(s+1), float(correct_c3d)/(s+1), float(correct_next)/(s+1), float(correct_help)/(s+1))
+                        
+                        for frame in range(s*fps+1, (s+1)*fps+1)
+                                video.set(1, frame)
+                                ret, im = video.read()
+                                text = 'Now: ' + now_word + '. Next: ' + next_word 
+                                cv2.putText(im, text ,(10,10),1,1,(255,255,255))
+                                text = 'Help: ' + action + ' ' + obj + ' ' + place 
+                                cv2.putText(im, text ,(20,20),1,1,(255,255,255))
+                                out.write(im)
                         
                         # pbar_second.update(1)
                 pbar_second.refresh()
