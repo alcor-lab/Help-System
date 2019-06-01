@@ -39,6 +39,13 @@ def extract_preprocessed_one_input(video_path, segment, prep_dataset):
         frame_list = extracted_frames.keys()
         return one_input, frame_list
 
+def im_write_im_read_trick(frame_matrix):
+        cv2.imwrite('temp/' + '_rgb.jpg',frame_matrix[:, :, :3])
+        cv2.imwrite('temp/' + '_flow_1.jpg',frame_matrix[:, :, 5])
+        cv2.imwrite('temp/' + '_flow_2.jpg',frame_matrix[:, :, 6])
+        cv2.imwrite('temp/' + '_pafMat.jpg',frame_matrix[:, :, 3])
+        cv2.imwrite('temp/' + '_heatMat.jpg',frame_matrix[:, :, 4])
+
 def test():
         prep_dataset = prep_dataset_man.prep_dataset()
         net = activity_network.activity_network()

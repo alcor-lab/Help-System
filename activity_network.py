@@ -184,6 +184,7 @@ class activity_network:
         frame[..., 3] = pafMat
         frame[..., 4] = heatMat
         frame[..., 5:7] = flow
+        frame = frame.astype(np.uint8)
         return frame
 
     def compound_second_frames(self, frames):
