@@ -54,7 +54,7 @@ class activity_network:
         self.architecture = tf.train.import_meta_graph('model/activity_network_model.ckpt.meta')
         self.latest_ckp = tf.train.latest_checkpoint('model')
 
-        architecture.restore(self.sess, ckpts)
+        self.architecture.restore(self.sess, self.latest_ckp)
 
         # Show progress bar to visualize datasets creation
         self.use_pbar = True
