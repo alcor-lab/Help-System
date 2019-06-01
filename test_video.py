@@ -167,7 +167,7 @@ def test():
                         for frame in range(s*fps+1, (s+1)*fps+1):
                                 video.set(1, frame)
                                 ret, im = video.read()
-                                resized = cv2.resize(frame_matrix, dsize=(out_width, out_height), interpolation=cv2.INTER_CUBIC)
+                                im = cv2.resize(im, dsize=(out_width, out_height), interpolation=cv2.INTER_CUBIC)
 
                                 if help_label == help_word:
                                         color = GREEN_COLOR
