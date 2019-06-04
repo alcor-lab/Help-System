@@ -110,3 +110,5 @@ model/checkpoint
 
 checkpoint/
 tensorboardLogs/
+test_pic/
+temp/

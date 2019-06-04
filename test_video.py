@@ -37,6 +37,7 @@ def test():
 
         RED_COLOR = (0,0,255)
         GREEN_COLOR = (0,255,0)
+        print(path_collection)
         for path in path_collection:
                 net.hidden_states_collection = {}
                 output_collection[path] = {}
@@ -72,7 +73,7 @@ def test():
                 correct_c3d = 0
                 correct_next = 0
                 correct_help = 0
-                for s in range(seconds):
+                for s in range(seconds-1):
                         
                         linspace_frame = np.linspace(s*fps+1, (s+1)*fps+1, num=config.frames_per_step)
                         linspace_frame = [int(x) for x in linspace_frame]
@@ -159,10 +160,10 @@ def test():
                                 if help_label == help_word:
                                         correct_help += 1
 
-                                # print('\n')
-                                # print(' ', now_target, now_target, next_label, help_label)
-                                # print(' ', now_word, c3d_word, next_word, action, obj, place)
-                                # print('prep ', float(correct_now)/(s+1), float(correct_c3d)/(s+1), float(correct_next)/(s+1), float(correct_help)/(s+1))
+                                print('\n')
+                                print(' ', now_target, now_target, next_label, help_label)
+                                print(' ', now_word, c3d_word, next_word, action, obj, place)
+                                print('prep ', float(correct_now)/(s+1), float(correct_c3d)/(s+1), float(correct_next)/(s+1), float(correct_help)/(s+1))
                         
                         for frame in range(s*fps+1, (s+1)*fps+1):
                                 video.set(1, frame)
