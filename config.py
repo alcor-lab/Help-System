@@ -12,5 +12,6 @@ lstm_units = int(enc_fc_2 / 2)
 pre_class = int(lstm_units / 2)
 encoder_lstm_layers = 3*[lstm_units]
 hidden_states_dim = lstm_units
+vocab_len = 33
 
 test_video_path = 'dataset/Video/kit_dataset/TEST_VIDEOS'
