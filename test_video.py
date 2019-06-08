@@ -138,6 +138,8 @@ def test():
                                 obj = help_softmax[1,:]
                                 place = help_softmax[2,:]
 
+                                pp.pprint(now_word)
+
                                 now_word_max = np.argmax(now_word, axis=0)
                                 c3d_word_max = np.argmax(c3d_word, axis=0)
                                 next_word_max = np.argmax(next_word, axis=0)
@@ -146,7 +148,7 @@ def test():
                                 place_max = np.argmax(place, axis=0)
 
                                 now_prob = now_word[now_word_max]
-                                c3d_prob = now_word[c3d_word_max]
+                                c3d_prob = c3d_word[c3d_word_max]
                                 next_prob = next_word[next_word_max]
                                 action_prob = action[action_max]
                                 obj_prob = obj[obj_max]
