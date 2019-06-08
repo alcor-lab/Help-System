@@ -113,7 +113,6 @@ def test():
                         next_label = id_to_label[ordered_collection[path][s]['next_label']]
                         help_label = id_to_label[ordered_collection[path][s]['help']]
                         sec_obj = ordered_collection[path][s]['obj_label']
-                        print(sec_obj)
                         sec_id_obj = {}
                         for obj in sec_obj.keys():
                                 position = word_to_id[obj]
