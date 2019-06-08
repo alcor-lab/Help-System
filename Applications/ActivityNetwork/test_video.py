@@ -2,10 +2,10 @@
 import __init__
 from __init__ import PROJECT_DIR
 
-from activity_recognition.activity_network import ActivityNetwork
+from help_recognition.activity_network import ActivityNetwork
 import pprint
 import pickle
-import activity_recognition.config as config
+import help_recognition.config as config
 import cv2
 import numpy as np
 import os

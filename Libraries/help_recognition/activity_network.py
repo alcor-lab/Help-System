@@ -36,7 +36,7 @@ from tqdm import tqdm
 import cv2
 import numpy as np
 import multiprocessing.dummy as mt
-import activity_recognition.config as config
+import help_recognition.config as config
 import pprint
 pp = pprint.PrettyPrinter(indent=4)
 
