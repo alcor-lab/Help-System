@@ -46,21 +46,22 @@ def get_available_gpus():
     # return local_device_protos
 
 class ActivityNetwork:
-    def __init__(self, meta_graph, checkpoint, sess=None):
+    def __init__(self, meta_graph, checkpoint, sess=None, device=None):
         self._meta_graph = meta_graph
         self._checkpoint = checkpoint
 
+
+        # load architecture in graph and weights in session and initialize
+        with tf.device(device):
+            self.graph = tf.get_default_graph()
+        self.architecture = tf.train.import_meta_graph(self._meta_graph)
+        self.latest_ckp = tf.train.latest_checkpoint(self._checkpoint)
+        
         # creating a Session
         if sess is None:
             self.sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True, log_device_placement=False))
         else:
             self.sess = sess
-
-        # load architecture in graph and weights in session and initialize
-
-        self.graph = tf.get_default_graph()
-        self.architecture = tf.train.import_meta_graph(self._meta_graph)
-        self.latest_ckp = tf.train.latest_checkpoint(self._checkpoint)
 
         self.architecture.restore(self.sess, self.latest_ckp)
 
