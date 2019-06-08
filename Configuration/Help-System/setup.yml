@@ -2,6 +2,7 @@ get:
   _:
     - install_clang: '3.9'
     - apt_install: libstdc++-6-dev
+    - apt_install: python3-pil.imagetk
     - pip3_install:
         packages: pip
         upgrade: True
@@ -11,7 +12,8 @@ get:
     - pip3_install:
         packages: cython
         upgrade: True               
-    - pip3_install:      
+    - pip3_install: 
+      - ipython     
       - keras
       - imgaug
       - pillow

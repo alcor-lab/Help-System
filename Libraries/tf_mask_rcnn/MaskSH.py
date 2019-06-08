@@ -23,7 +23,6 @@ class MaskSH:
             IMAGES_PER_GPU = 1
             NUM_CLASSES = len(self.class_list)
 
-        print(checkpoint_path)
         self.latest_ckp = tf.train.latest_checkpoint(checkpoint_path)
         self.config = InferenceConfig()
         self.model = modellib.MaskRCNN(mode="inference", config=self.config)
