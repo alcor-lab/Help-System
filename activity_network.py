@@ -142,7 +142,7 @@ class activity_network:
         for indx in range(len(dict_obj)):
             obj = dict_obj[indx]
             for obj_id in obj:
-                obj_input[1,1,indx,obj_id] = obj[obj_id]
+                obj_input[0,0,indx,obj_id] = obj[obj_id]
         
         return obj_input
 
