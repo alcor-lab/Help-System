@@ -138,7 +138,6 @@ class activity_network:
 
     def generate_obj_tensor(self, dict_obj):
         obj_input = np.zeros(shape=(1, 1, config.seq_len, config.vocab_len), dtype=float)
-        print(dict_obj)
         for indx in range(len(dict_obj)):
             obj = dict_obj[indx]
             for obj_id in obj:
