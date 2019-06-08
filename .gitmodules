@@ -1,0 +1,4 @@
+[submodule "Dependencies/ProjectTools"]
+	path = Dependencies/ProjectTools
+	url = git@github.com:SecondHands/ProjectTools.git
+	branch = master

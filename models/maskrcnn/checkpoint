@@ -1,0 +1,2 @@
+model_checkpoint_path: "/home/edoardo/Desktop/Mask_Edo/checkpoint/model.ckpt"
+all_model_checkpoint_paths: "/home/edoardo/Desktop/Mask_Edo/checkpoint/model.ckpt"

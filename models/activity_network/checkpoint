@@ -1,0 +1,2 @@
+model_checkpoint_path: "activity_network_model.ckpt"
+all_model_checkpoint_paths: "activity_network_model.ckpt"
