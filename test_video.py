@@ -117,7 +117,7 @@ def test():
                         sec_id_obj = {}
                         for obj in sec_obj.keys():
                                 position = word_to_id[obj]
-                                value = obj_label[obj]
+                                value = sec_obj[obj]
                                 sec_id_obj[position] = value
 
                         obj_list.append(sec_id_obj)
