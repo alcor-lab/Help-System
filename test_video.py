@@ -122,7 +122,7 @@ def test():
                         obj_list.append(sec_id_obj)
                         if s >= 3:
                                 input_sec = second_collection[-4:]
-                                input_obj = second_collection[-4:]
+                                input_obj = obj_list[-4:]
                                 now_softmax, next_softmax, help_softmax, c3d_softmax = net.compute_activity_given_seconds_matrix(input_sec, s, input_obj)
 
                                 output_collection[path][s] = {}
