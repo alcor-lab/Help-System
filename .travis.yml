@@ -1,0 +1,62 @@
+cache: apt
+dist: trusty
+language: generic
+sudo: required
+group: edge
+
+env:
+  REPOSITORY="Help-System"
+  DOCKER_IMAGE="help--system"
+  DOCKER_CONTAINER="help-_system"
+  DOCKER_USER="travis"
+  DOCKER_REGISTRY="gcr.io/neon-rampart-204112"
+  DOCKER_HOME="/home/${DOCKER_USER}"
+  DOCKER_BUILD_DIR="${DOCKER_HOME}/${REPOSITORY}"
+  DOCKER_VOLUME_DIR="${DOCKER_HOME}/Volume"
+  PATH="${HOME}/.local/bin:${PATH}"
+
+services:
+  - docker
+
+before_install:
+- function bust_log_silence_limit() { while true; do sleep 360; echo `date`; done }
+- bust_log_silence_limit&
+- sudo apt-get install -y python3-pip
+- mkdir -p ${HOME}/.local/bin
+- sudo ln -s
+    ${TRAVIS_BUILD_DIR}/Dependencies/ProjectTools/Scripts/ProjectTools/hey.py
+    ${HOME}/.local/bin/hey
+- hey --help
+
+install:
+- hey dependency ProjectTools run script gcloud_install
+- hey dependency ProjectTools run script gcloud_authenticate
+- hey dependency ProjectTools run script clang_format
+- VERSION_TAG=$(hey dependency ProjectTools run script version_bump | tail -1)
+
+script:
+- docker build -t ${DOCKER_IMAGE} ${TRAVIS_BUILD_DIR}
+- docker run -id
+    --name ${DOCKER_CONTAINER}
+    --volume ${REPOSITORY}:${DOCKER_VOLUME_DIR}
+    ${DOCKER_IMAGE} bash
+- docker exec --user ${DOCKER_USER} ${DOCKER_CONTAINER}
+    hey project setup build --all
+- docker exec --user ${DOCKER_USER} ${DOCKER_CONTAINER}
+    hey project setup run --tests
+- docker exec --user ${DOCKER_USER} ${DOCKER_CONTAINER}
+    hey project setup run --clang-tidy
+
+after_success:
+- |
+  if [ $TRAVIS_BRANCH = development ] || [ $TRAVIS_BRANCH = master ]; then
+    git push origin HEAD:$TRAVIS_BRANCH
+    docker tag ${DOCKER_IMAGE} ${DOCKER_REGISTRY}/${DOCKER_IMAGE}:${VERSION_TAG}
+    docker push ${DOCKER_REGISTRY}/${DOCKER_IMAGE}:${VERSION_TAG}
+    docker tag ${DOCKER_IMAGE} ${DOCKER_REGISTRY}/${DOCKER_IMAGE}
+    docker push ${DOCKER_REGISTRY}/${DOCKER_IMAGE}
+  fi
+
+after_script:
+- docker stop ${DOCKER_CONTAINER}
+- docker rm ${DOCKER_CONTAINER}

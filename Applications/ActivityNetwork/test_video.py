@@ -1,11 +1,16 @@
-import activity_network
+
+import __init__
+from __init__ import PROJECT_DIR
+
+from activity_recognition.activity_network import ActivityNetwork
 import pprint
 import pickle
-import config
+import activity_recognition.config as config
 import cv2
 import numpy as np
 import os
 from tqdm import tqdm
+
 
 pp = pprint.PrettyPrinter(indent=4)
 
@@ -18,7 +23,11 @@ def load(name):
         return pickle.load(f)
 
 def test():
-        net = activity_network.activity_network()
+        MODEL_PATH = os.path.join(PROJECT_DIR, 'Data', 'model_data', 'activity_network')
+        META_GRAPH_PATH = os.path.join(MODEL_PATH, 'activity_network_model.ckpt.meta')
+        CHECKPONT_PATH = MODEL_PATH
+
+        net = ActivityNetwork(META_GRAPH_PATH, CHECKPONT_PATH)
         test_collection = load('test_collection')
         id_to_word = load('id_to_word')
         id_to_label = load('id_to_label')

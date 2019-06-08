@@ -20,6 +20,11 @@ logging_config = dict(
         },
 )
 
+__all__ = [
+    'ActivityNetwork',
+]
+
+
 dictConfig(logging_config)
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
@@ -31,7 +36,7 @@ from tqdm import tqdm
 import cv2
 import numpy as np
 import multiprocessing.dummy as mt
-import config
+import activity_recognition.config as config
 import pprint
 pp = pprint.PrettyPrinter(indent=4)
 
@@ -40,8 +45,11 @@ def get_available_gpus():
     return [x for x in local_device_protos if x.device_type == 'GPU']
     # return local_device_protos
 
-class activity_network:
-    def __init__(self, sess=None):
+class ActivityNetwork:
+    def __init__(self, meta_graph, checkpoint, sess=None):
+        self._meta_graph = meta_graph
+        self._checkpoint = checkpoint
+
         # creating a Session
         if sess is None:
             self.sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True, log_device_placement=False))
@@ -51,8 +59,8 @@ class activity_network:
         # load architecture in graph and weights in session and initialize
 
         self.graph = tf.get_default_graph()
-        self.architecture = tf.train.import_meta_graph('model/activity_network_model.ckpt.meta')
-        self.latest_ckp = tf.train.latest_checkpoint('model')
+        self.architecture = tf.train.import_meta_graph(self._meta_graph)
+        self.latest_ckp = tf.train.latest_checkpoint(self._checkpoint)
 
         self.architecture.restore(self.sess, self.latest_ckp)
 
@@ -121,13 +129,13 @@ class activity_network:
         shape_flow = flow.shape
         shape_heatMat = heatMat.shape
         shape_pafMat = pafMat.shape
-        if shape_img[0] != config.op_input_height:
+        if shape_img[0] != config.out_H:
             img = cv2.resize(img, dsize=(config.out_H, config.out_W), interpolation=cv2.INTER_CUBIC)
-        if shape_flow[0] != config.op_input_height:
+        if shape_flow[0] != config.out_H:
             flow = cv2.resize(flow, dsize=(config.out_H, config.out_W), interpolation=cv2.INTER_CUBIC)
-        if shape_heatMat[0] != config.op_input_height:
+        if shape_heatMat[0] != config.out_H:
             heatMat = cv2.resize(heatMat, dsize=(config.out_H, config.out_W), interpolation=cv2.INTER_CUBIC)
-        if shape_pafMat[0] != config.op_input_height:
+        if shape_pafMat[0] != config.out_H:
             pafMat = cv2.resize(pafMat, dsize=(config.out_H, config.out_W), interpolation=cv2.INTER_CUBIC)
         frame[..., :3] = img
         frame[..., 3] = heatMat

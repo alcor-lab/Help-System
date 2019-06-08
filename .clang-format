@@ -1,0 +1,12 @@
+BasedOnStyle: WebKit
+AlignTrailingComments: true
+AlignOperands: true
+AllowShortBlocksOnASingleLine: true
+AllowShortIfStatementsOnASingleLine: true
+AllowShortLoopsOnASingleLine: true
+ColumnLimit: 79
+Cpp11BracedListStyle: true
+NamespaceIndentation: None
+SortIncludes: true
+SpacesInContainerLiterals: false
+Standard: Cpp11
