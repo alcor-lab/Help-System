@@ -112,7 +112,7 @@ def test():
                         now_target = id_to_label[ordered_collection[path][s]['now_label']]
                         next_label = id_to_label[ordered_collection[path][s]['next_label']]
                         help_label = id_to_label[ordered_collection[path][s]['help']]
-                        sec_obj = ordered_collection[path][s]['obj_label']])
+                        sec_obj = ordered_collection[path][s]['obj_label']
                         
                         sec_id_obj = {}
                         for obj in sec_obj.keys():
