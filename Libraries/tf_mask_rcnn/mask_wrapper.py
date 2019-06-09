@@ -17,7 +17,6 @@ class MaskWrapper(NetworkWrapper):
         self.class_list = self.nn.class_list
 
         if self.display:
-            self.colors = visualize.random_colors(len(self.class_list))
             self.ax = plt.axes()
 
 
@@ -31,7 +30,7 @@ class MaskWrapper(NetworkWrapper):
         if self.display:
             r = self.results[0]
             visualize.display_instances(self.images[0], r['rois'], r['masks'], r['class_ids'],
-                                            self.class_list, r['scores'], colors=self.colors, pause=0.5, ax=self.ax)
+                                            self.class_list, r['scores'], pause=0.5, ax=self.ax)
 
     def set_data(self, images):
         self.images = images
