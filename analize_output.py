@@ -1,4 +1,3 @@
-import activity_network
 import pprint
 import pickle
 import config
