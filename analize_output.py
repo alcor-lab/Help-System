@@ -22,7 +22,8 @@ def load(name):
         return pickle.load(f)
 
 def create_cm_pic(cm_in, number_of_classes, word_list, tensor_name):
-        cm = cm_in / cm_in.astype(np.float).sum(axis=0)
+        sum_axis = cm_in.sum(axis=0)
+        cm = cm_in / sum_axis
         fig = matplotlib.figure.Figure(figsize=(7, 7), dpi=300, facecolor='w', edgecolor='k')
         ax = fig.add_subplot(1, 1, 1)
         im = ax.imshow(cm, cmap='Oranges')
@@ -66,12 +67,12 @@ def create_confusion():
                 for word in word_to_id.keys():
                         word_to_acc[pred_type][word] = 0 
 
-        now_cm = np.zeros((len(word_to_id), len(word_to_id)), dtype=np.int32)
-        c3d_cm = np.zeros((len(word_to_id), len(word_to_id)), dtype=np.int32)
-        next_cm = np.zeros((len(word_to_id), len(word_to_id)), dtype=np.int32)
-        help_cm = np.zeros((len(word_to_id), len(word_to_id)), dtype=np.int32)
-        obj_cm = np.zeros((len(word_to_id), len(word_to_id)), dtype=np.int32)
-        place_cm = np.zeros((len(word_to_id), len(word_to_id)), dtype=np.int32)
+        now_cm = np.zeros((len(word_to_id), len(word_to_id)), dtype=np.float)
+        c3d_cm = np.zeros((len(word_to_id), len(word_to_id)), dtype=np.float)
+        next_cm = np.zeros((len(word_to_id), len(word_to_id)), dtype=np.float)
+        help_cm = np.zeros((len(word_to_id), len(word_to_id)), dtype=np.float)
+        obj_cm = np.zeros((len(word_to_id), len(word_to_id)), dtype=np.float)
+        place_cm = np.zeros((len(word_to_id), len(word_to_id)), dtype=np.float)
 
         for path in output_collection:
                 for sec in output_collection[path]:
