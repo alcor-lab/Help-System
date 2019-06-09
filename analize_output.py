@@ -10,6 +10,7 @@ import io
 import itertools
 import matplotlib
 import pickle
+import cv2
 
 
 def save(obj, name):
