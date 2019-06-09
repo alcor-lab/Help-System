@@ -92,16 +92,18 @@ def create_confusion():
                         obj_id = np.argmax(obj, axis=0)
                         place_id = np.argmax(place, axis=0)
 
-                        now_label = ordered_collection[path][sec]['now_label']
-                        next_label = ordered_collection[path][sec]['next_label']
+                        now_label = id_to_label[ordered_collection[path][sec]['now_label']]
+                        next_label =id_to_label[ ordered_collection[path][sec]['next_label']]
                         help_label = id_to_label[ordered_collection[path][sec]['help']].split(' ')
 
                         if help_label == 'sil':
                                 help_label = 'sil sil sil'
 
-                        action_label = id_to_word[help_label[0]]
-                        obj_label = id_to_word[help_label[1]]
-                        place_label = id_to_word[help_label[2]]
+                        now_label = word_to_id[now_label]
+                        next_label = word_to_id[next_label]
+                        action_label = word_to_id[help_label[0]]
+                        obj_label = word_to_id[help_label[1]]
+                        place_label = word_to_id[help_label[2]]
 
                         now_cm[now_id, now_label] += 1
                         c3d_cm[c3d_id, now_label] += 1
