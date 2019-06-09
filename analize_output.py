@@ -31,8 +31,6 @@ def create_cm_pic(cm_in, number_of_classes, word_list, tensor_name):
                         if place_sum > 0:
                                 mean = float(place_sum)/float(sum_row)
                         cm[row, col] = mean
-        sum_axis = cm_in.sum(axis=0)
-        cm = cm_in / sum_axis
         fig = matplotlib.figure.Figure(figsize=(7, 7), dpi=300, facecolor='w', edgecolor='k')
         ax = fig.add_subplot(1, 1, 1)
         im = ax.imshow(cm, cmap='Oranges')
