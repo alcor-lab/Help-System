@@ -50,11 +50,10 @@ class ActivityNetwork:
         self._meta_graph = meta_graph
         self._checkpoint = checkpoint
 
-
         # load architecture in graph and weights in session and initialize
         with tf.device(device):
             self.graph = tf.get_default_graph()
-        self.architecture = tf.train.import_meta_graph(self._meta_graph)
+            self.architecture = tf.train.import_meta_graph(self._meta_graph, clear_devices=True)
         self.latest_ckp = tf.train.latest_checkpoint(self._checkpoint)
         
         # creating a Session

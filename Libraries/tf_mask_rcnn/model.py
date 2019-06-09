@@ -2312,13 +2312,18 @@ class MaskRCNN():
     The actual Keras model is in the keras_model property.
     """
 
-    def __init__(self, mode, config, model_dir = ""):
+    def __init__(self, mode, config, sess, model_dir = ""):
         """
         mode: Either "training" or "inference"
         config: A Sub-class of the Config class
         model_dir: Directory to save training logs and trained weights
         """
         assert mode in ['training', 'inference']
+        if sess is None:
+            self.sess = tf.Session()
+        else:
+            self.sess = sess
+
         self.mode = mode
         self.config = config
         self.model_dir = model_dir
@@ -3021,7 +3026,7 @@ class MaskRCNN():
         results = []
         return results
 
-    def shDetect(self, images, s, verbose=0):
+    def shDetect(self, images, verbose=0):
 
 
         molded_images, image_metas, windows = self.mold_inputs(images)
@@ -3031,7 +3036,7 @@ class MaskRCNN():
         actual_input = [molded_images, image_metas, anchors]
 
         detections, _, _, mrcnn_mask, _, _, _ = \
-            s.run(self.model[1][:8], feed_dict={i: d for i, d in zip(self.model[0], actual_input)})
+            self.sess.run(self.model[1][:8], feed_dict={i: d for i, d in zip(self.model[0], actual_input)})
         results = []
         for i, image in enumerate(images):
             final_rois, final_class_ids, final_scores, final_masks =\
