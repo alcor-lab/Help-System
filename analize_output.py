@@ -9,6 +9,7 @@ import re
 import io
 import itertools
 import matplotlib
+import pickle
 
 
 def save(obj, name):
