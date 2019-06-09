@@ -56,6 +56,7 @@ def create_cm_pic(cm_in, number_of_classes, word_list, tensor_name):
 def create_confusion():
         word_to_id = load('word_to_id')
         id_to_label = load('id_to_label')
+        id_to_word = load('id_to_word')
         ordered_collection = load('ordered_collection')
         output_collection = load('output_collection')
         
@@ -91,16 +92,16 @@ def create_confusion():
                         obj_id = np.argmax(obj, axis=0)
                         place_id = np.argmax(place, axis=0)
 
-                        now_label = id_to_label[ordered_collection[path][sec]['now_label']]
-                        next_label = id_to_label[ordered_collection[path][sec]['next_label']]
+                        now_label = ordered_collection[path][sec]['now_label']
+                        next_label = ordered_collection[path][sec]['next_label']
                         help_label = id_to_label[ordered_collection[path][sec]['help']].split(' ')
 
                         if help_label == 'sil':
                                 help_label = 'sil sil sil'
 
-                        action_label = id_to_label[help_label[0]]
-                        obj_label = id_to_label[help_label[1]]
-                        place_label = id_to_label[help_label[2]]
+                        action_label = id_to_word[help_label[0]]
+                        obj_label = id_to_word[help_label[1]]
+                        place_label = id_to_word[help_label[2]]
 
                         now_cm[now_id, now_label] += 1
                         c3d_cm[c3d_id, now_label] += 1
