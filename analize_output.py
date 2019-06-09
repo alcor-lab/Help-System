@@ -22,6 +22,13 @@ def load(name):
         return pickle.load(f)
 
 def create_cm_pic(cm_in, number_of_classes, word_list, tensor_name):
+        cm = np.zeros((len(word_to_id), len(word_to_id)), dtype=np.float)
+        for row in len(word_to_id):
+                sum_row = cm_in[row, :].sum()
+                for col in len(word_to_id):
+                        place_sum = cm_in[row, col]
+                        mean = float(place_sum)/float(sum_row)
+                        cm[row, col] = mean
         sum_axis = cm_in.sum(axis=0)
         cm = cm_in / sum_axis
         fig = matplotlib.figure.Figure(figsize=(7, 7), dpi=300, facecolor='w', edgecolor='k')
