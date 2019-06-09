@@ -94,7 +94,7 @@ def create_confusion():
 
                         now_label = id_to_label[ordered_collection[path][sec]['now_label']]
                         next_label =id_to_label[ ordered_collection[path][sec]['next_label']]
-                        help_label = id_to_label[ordered_collection[path][sec]['help']].split(' ')
+                        help_label = id_to_label[ordered_collection[path][sec]['help']]
 
                         if help_label == 'sil':
                                 help_label = 'sil sil sil'
