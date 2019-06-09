@@ -22,7 +22,7 @@ def load(name):
         return pickle.load(f)
 
 def create_cm_pic(cm_in, number_of_classes, word_list, tensor_name):
-        cm = cm_in / cm_in.astype(np.float).sum(axis=1)
+        cm = cm_in / cm_in.astype(np.float).sum(axis=0)
         fig = matplotlib.figure.Figure(figsize=(7, 7), dpi=300, facecolor='w', edgecolor='k')
         ax = fig.add_subplot(1, 1, 1)
         im = ax.imshow(cm, cmap='Oranges')
