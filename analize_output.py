@@ -99,6 +99,7 @@ def create_confusion():
                         if help_label == 'sil':
                                 help_label = 'sil sil sil'
 
+                        help_label = help_label.split(' ')
                         now_label = word_to_id[now_label]
                         next_label = word_to_id[next_label]
                         action_label = word_to_id[help_label[0]]
