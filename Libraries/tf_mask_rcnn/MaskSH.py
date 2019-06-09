@@ -8,7 +8,6 @@ import matplotlib
 import matplotlib.pyplot as plt
 from tf_mask_rcnn import utils
 import tf_mask_rcnn.model as modellib
-from tf_mask_rcnn import visualize
 import tf_mask_rcnn.coco as coco
 import tensorflow as tf
 
@@ -44,3 +43,4 @@ class MaskSH:
         for i in range(len(r['class_ids'])):
             output[self.class_list[r['class_ids'][i]]] = r['scores'][i]
         return output, result
+    
