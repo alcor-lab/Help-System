@@ -63,7 +63,6 @@ class ActivityNetwork:
             self.sess = sess
 
         self.architecture.restore(self.sess, self.latest_ckp)
-
         # Show progress bar to visualize datasets creation
         self.use_pbar = True
         self.hidden_states_collection = {}
@@ -76,9 +75,10 @@ class ActivityNetwork:
         self.pose_out_2 = self.graph.get_tensor_by_name(pose_out_name_2 + ":0")
 
         # Retrieving activity recognition network inputs and outputs
-        self.input = self.graph.get_tensor_by_name("Inputs/Input/Input:0")
-        self.h_input = self.graph.get_tensor_by_name("Inputs/Input/h_input:0")
-        self.c_input = self.graph.get_tensor_by_name("Inputs/Input/c_input:0")
+        self.input = self.graph.get_tensor_by_name("Input/Input:0")
+        self.h_input = self.graph.get_tensor_by_name("Input/h_input:0")
+        self.c_input = self.graph.get_tensor_by_name("Input/c_input:0")
+        self.obj_input = self.graph.get_tensor_by_name("Object_Input/obj_input:0")
         self.c3d_softmax = self.graph.get_tensor_by_name("Network/Activity_Recognition_Network/c3d_classifier/Softmax:0")
         self.now_softmax = self.graph.get_tensor_by_name("Network/Activity_Recognition_Network/Now_Decoder_inference/softmax_out:0")
         self.help_softmax = self.graph.get_tensor_by_name("Network/Activity_Recognition_Network/Help_Decoder_inference/softmax_out:0")
@@ -144,6 +144,16 @@ class ActivityNetwork:
         frame = frame.astype(np.uint8)
         return frame
 
+    def generate_obj_tensor(self, dict_obj):
+        obj_input = np.zeros(shape=(1, 1, config.seq_len, config.vocab_len), dtype=float)
+        for indx in range(len(dict_obj)):
+            obj = dict_obj[indx]
+            for obj_id in obj:
+                obj_input[0,0,indx,obj_id] = obj[obj_id]
+        
+        return obj_input
+
+
     def compound_second_frames(self, frames):
         # group frames from one second
         number_of_frames = len(frames)
@@ -167,7 +177,7 @@ class ActivityNetwork:
         if number_of_second != config.seq_len:
             raise ValueError('not correct number of seconds')
         
-        tensor = np.zeros(shape=(4, 1, config.seq_len, config.frames_per_step, config.out_H, config.out_W, 7), dtype=np.uint8)
+        tensor = np.zeros(shape=(1, 1, config.seq_len, config.frames_per_step, config.out_H, config.out_W, 7), dtype=np.uint8)
 
         i=0
         for second in seconds:
@@ -211,33 +221,34 @@ class ActivityNetwork:
         self.hidden_states_collection[second_id]['h'] = h
         self.hidden_states_collection[second_id]['c'] = c
 
-    def compute_activity_given_tensor(self, tensor, second_count):     
+    def compute_activity_given_tensor(self, tensor, second_count, dict_obj):     
         # compute results from network given tensor and last second time count 
         c, h =self.retrieve_hidden_state(second_count)
-
+        obj_tensor = self.generate_obj_tensor(dict_obj)
         now_softmax, help_softmax, next_softmax, c3d_softmax, c_out, h_out = self.sess.run([self.now_softmax, self.help_softmax, self.next_softmax, self.c3d_softmax,
                                                                                 self.c_out, self.h_out],
                                                                                 feed_dict={self.input: tensor,
                                                                                             self.h_input: h,
-                                                                                            self.c_input: c})
+                                                                                            self.c_input: c,
+                                                                                            self.obj_input: obj_tensor})
 
         self.save_hidden_state(second_count, c_out, h_out)
 
         return now_softmax[0,:4,:], next_softmax, help_softmax[0,:3,:], c3d_softmax
     
-    def compute_activity_given_seconds_matrix(self, seconds, second_count):     
+    def compute_activity_given_seconds_matrix(self, seconds, second_count, dict_obj):     
         # compute results from network given list of second tensor and last second time count
         tensor = self.create_input_tensor_given_seconds(seconds)
 
-        now_softmax, next_softmax, help_softmax, c3d_softmax = self.compute_activity_given_tensor(tensor, second_count)
+        now_softmax, next_softmax, help_softmax, c3d_softmax = self.compute_activity_given_tensor(tensor, second_count, dict_obj)
 
         return now_softmax, next_softmax, help_softmax, c3d_softmax
 
-    def compute_activity_given_frame_list(self, frames_collection, second_count):
+    def compute_activity_given_frame_list(self, frames_collection, second_count, dict_obj):
         # compute results from network given list of list of frames and last second time count
         tensor = self.create_input_tensor_given_preprocessed_frame(frames_collection)
 
-        now_softmax, next_softmax, help_softmax, c3d_softmax = self.compute_activity_given_tensor(tensor, second_count)
+        now_softmax, next_softmax, help_softmax, c3d_softmax = self.compute_activity_given_tensor(tensor, second_count, dict_obj)
 
         return now_softmax, next_softmax, help_softmax, c3d_softmax
 

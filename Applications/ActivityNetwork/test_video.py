@@ -30,6 +30,7 @@ def test():
         net = ActivityNetwork(META_GRAPH_PATH, CHECKPONT_PATH)
         test_collection = load('test_collection')
         id_to_word = load('id_to_word')
+        word_to_id = load('word_to_id')
         id_to_label = load('id_to_label')
         ordered_collection = load('ordered_collection')
         path_collection = []
@@ -56,6 +57,7 @@ def test():
                 fps = int(video.get(cv2.CAP_PROP_FPS))
                 seconds = int(framecount/fps)
                 second_collection = []
+                obj_list= []
                 vers2_collection = []
                 pbar_second = tqdm(total=seconds, leave=False, desc='seconds')
                 width = int(video.get(cv2.CAP_PROP_FRAME_WIDTH))
@@ -119,9 +121,18 @@ def test():
                         now_target = id_to_label[ordered_collection[path][s]['now_label']]
                         next_label = id_to_label[ordered_collection[path][s]['next_label']]
                         help_label = id_to_label[ordered_collection[path][s]['help']]
+                        sec_obj = ordered_collection[path][s]['obj_label']
+                        sec_id_obj = {}
+                        for obj in sec_obj.keys():
+                                position = word_to_id[obj]
+                                value = sec_obj[obj]
+                                sec_id_obj[position] = value
+
+                        obj_list.append(sec_id_obj)
                         if s >= 3:
                                 input_sec = second_collection[-4:]
-                                now_softmax, next_softmax, help_softmax, c3d_softmax = net.compute_activity_given_seconds_matrix(input_sec, s)
+                                input_obj = obj_list[-4:]
+                                now_softmax, next_softmax, help_softmax, c3d_softmax = net.compute_activity_given_seconds_matrix(input_sec, s, input_obj)
 
                                 output_collection[path][s] = {}
                                 output_collection[path][s]['now_softmax'] = now_softmax
@@ -136,6 +147,8 @@ def test():
                                 obj = help_softmax[1,:]
                                 place = help_softmax[2,:]
 
+                                pp.pprint(now_word)
+
                                 now_word_max = np.argmax(now_word, axis=0)
                                 c3d_word_max = np.argmax(c3d_word, axis=0)
                                 next_word_max = np.argmax(next_word, axis=0)
@@ -144,7 +157,7 @@ def test():
                                 place_max = np.argmax(place, axis=0)
 
                                 now_prob = now_word[now_word_max]
-                                c3d_prob = now_word[c3d_word_max]
+                                c3d_prob = c3d_word[c3d_word_max]
                                 next_prob = next_word[next_word_max]
                                 action_prob = action[action_max]
                                 obj_prob = obj[obj_max]
