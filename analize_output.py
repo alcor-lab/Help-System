@@ -22,7 +22,7 @@ def load(name):
         return pickle.load(f)
 
 def create_cm_pic(cm_in, number_of_classes, word_list, tensor_name):
-        cm = np.zeros((number_of_classes, number_of_classes, dtype=np.float)
+        cm = np.zeros((number_of_classes, number_of_classes), dtype=np.float)
         for row in range(number_of_classes):
                 sum_row = cm_in[row, :].sum()
                 for col in range(number_of_classes):
