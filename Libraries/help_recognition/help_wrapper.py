@@ -35,10 +35,11 @@ class HelpWrapper(NetworkWrapper):
     def set_images_cache(self, images_cache):
         self.images_cache = images_cache
 
-    def set_data(self, images_pack, images_list, second):
+    def set_data(self, images_pack, images_list, second, objects):
         self.images_pack = images_pack
         self.images_list = images_list
         self.second = second
+        self.objects = objects
 
     def get_data(self):
         return self.help_softmax
@@ -56,7 +57,7 @@ class HelpWrapper(NetworkWrapper):
             x, x_mask = self.images_cache.process_images(self.images_pack, self.images_list)
             processing = time.time()
             self.now_softmax, self.next_softmax, self.help_softmax, _ = \
-                self.nn.compute_activity_given_tensor(x, self.second)
+                self.nn.compute_activity_given_tensor(x, self.second, self.objects)
             end = time.time()
             print('processing time:{} secs'.format(processing - start))
             print('network time:{} secs'.format(end - processing))
