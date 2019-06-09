@@ -22,10 +22,10 @@ def load(name):
         return pickle.load(f)
 
 def create_cm_pic(cm_in, number_of_classes, word_list, tensor_name):
-        cm = np.zeros((len(word_to_id), len(word_to_id)), dtype=np.float)
-        for row in len(word_to_id):
+        cm = np.zeros((number_of_classes, number_of_classes, dtype=np.float)
+        for row in range(number_of_classes):
                 sum_row = cm_in[row, :].sum()
-                for col in len(word_to_id):
+                for col in range(number_of_classes):
                         place_sum = cm_in[row, col]
                         mean = float(place_sum)/float(sum_row)
                         cm[row, col] = mean
