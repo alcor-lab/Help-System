@@ -11,8 +11,6 @@ import itertools
 import matplotlib
 
 
-pp = pprint.PrettyPrinter(indent=4)
-
 def save(obj, name):
     with open('dataset/' + name + '.pkl', 'wb') as f:
         pickle.dump(obj, f, pickle.HIGHEST_PROTOCOL)
