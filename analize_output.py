@@ -27,7 +27,9 @@ def create_cm_pic(cm_in, number_of_classes, word_list, tensor_name):
                 sum_row = cm_in[row, :].sum()
                 for col in range(number_of_classes):
                         place_sum = cm_in[row, col]
-                        mean = float(place_sum)/float(sum_row)
+                        mean = 0
+                        if place_sum > 0:
+                                mean = float(place_sum)/float(sum_row)
                         cm[row, col] = mean
         sum_axis = cm_in.sum(axis=0)
         cm = cm_in / sum_axis
