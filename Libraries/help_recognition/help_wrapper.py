@@ -29,6 +29,11 @@ class HelpWrapper(NetworkWrapper):
     def __init__(self, *args, **kwargs):
         super(HelpWrapper, self).__init__(*args, **kwargs)
 
+        self.help_pred = None
+        self.help_pred_labels = None
+        self.y_pred = None
+        self.y_pred_labels = None
+
         with self.sess.as_default(), self.sess.graph.as_default():
             self.nn = ActivityNetwork(self.meta_path, self.checkpoint_path, sess=self.sess, device=self.device)
 
@@ -42,7 +47,10 @@ class HelpWrapper(NetworkWrapper):
         self.objects = objects
 
     def get_data(self):
-        return self.help_softmax
+        return self.help_softmax, self.now_softmax, self.next_softmax
+
+    def get_predictions(self):
+        return self.help_pred_labels, self.y_pred_labels
 
     def spin(self):
         t = threading.Thread(name='help_network', target=self._execute)
@@ -62,22 +70,23 @@ class HelpWrapper(NetworkWrapper):
             print('processing time:{} secs'.format(processing - start))
             print('network time:{} secs'.format(end - processing))
             print('total time:{} secs'.format(end - start))
+            
             self.y_pred = np.expand_dims(np.argmax(self.now_softmax, axis=1), 0)
+            self.y_pred_labels = [self.labels[i] for i in self.y_pred.tolist()[0]]
+
             self.help_pred = np.expand_dims(np.argmax(self.help_softmax, axis=1), 0)
-            # return images_pack, y_pred, help_pred
+            self.help_pred_labels = [self.labels[i] for i in self.help_pred.tolist()[0]]            
 
     def visualize(self):
         if self.images_pack is not None:
             # printing outputs
-            y_pred_labels = [self.labels[i] for i in self.y_pred.tolist()[0]]
-            help_pred_labels = [self.labels[i] for i in self.help_pred.tolist()[0]]
-            print(help_pred_labels)
+            # print(self.help_pred_labels)
             
-            # estimated activity publishing
-            if self.output_proxy:
-                publish_string(output_proxy, y_pred_labels[0])
-                publish_string(output_proxy, help_pred_labels[0])
+            # # estimated activity publishing
+            # if self.output_proxy:
+            #     publish_string(self.output_proxy, self.y_pred_labels[0])
+            #     publish_string(self.output_proxy, self.help_pred_labels[0])
             
             # frames/activity display
             if self.display:
-                displayResult(self.images_pack, y_pred_labels[-1])
+                displayResult(self.images_pack, self.y_pred_labels[-1])

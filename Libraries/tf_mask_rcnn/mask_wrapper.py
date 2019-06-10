@@ -16,6 +16,9 @@ class MaskWrapper(NetworkWrapper):
     
         self.class_list = self.nn.class_list
 
+        self.output = None
+        self.results = None
+
         if self.display:
             self.ax = plt.axes()
 
@@ -24,8 +27,8 @@ class MaskWrapper(NetworkWrapper):
         for elem in self.output.keys():
             print(elem, '--->', self.output[elem])
         
-        if self.output_proxy:
-            pass
+        # if self.output_proxy:
+        #     pass
 
         if self.display:
             r = self.results[0]

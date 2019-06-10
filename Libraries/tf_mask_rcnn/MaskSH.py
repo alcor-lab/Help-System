@@ -21,13 +21,14 @@ class InferenceConfig(coco.CocoConfig):
     NUM_CLASSES = len(CLASSES)
 
 class MaskSH:
-
+    
     def __init__(self, checkpoint_path, sess=None, device=None):
         if sess is None:
             self.sess = tf.Session()
         else:
             self.sess = sess
-    
+
+        self.shape = (1080, int(1080*4/3))
         self.class_list = CLASSES   
         with tf.device(device):
             self.latest_ckp = tf.train.latest_checkpoint(checkpoint_path) 
@@ -51,15 +52,15 @@ class MaskSH:
         if diverter_index not in class_ids.tolist():
             return "No diverter"
 
-        mask_person = np.zeros((480,640))
+        mask_person = np.zeros(self.shape)
         mask_person = np.where(masks[class_label.index('technician'), :, :]==True,50, mask_person)
 
         diverter_bb = rois[class_label.index('diverter')]
         x1, x2, y1, y2 = diverter_bb
-        mask_diverter = np.zeros((480,640))
+        mask_diverter = np.zeros(self.shape)
         mask_diverter[x1:y1, x2:y2] = 100
 
-        mask_diverter_extended = np.zeros((480,640))
+        mask_diverter_extended = np.zeros(self.shape)
         mask_diverter_extended[:, :y2] = 100
 
         diverter_person = mask_diverter + mask_person
