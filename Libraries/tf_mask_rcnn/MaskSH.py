@@ -11,7 +11,7 @@ import tf_mask_rcnn.model as modellib
 import tf_mask_rcnn.coco as coco
 import tensorflow as tf
 
-CLASSES = ['BG','spraybottle', 'screwdriver', 'torch', 'cloth', 'cutter', 
+CLASSES = ['BG','spray_bottle', 'screwdriver', 'torch', 'cloth', 'cutter', 
                             'pliers', 'brush', 'torch_handle', 'guard', 'ladder', 'closed_ladder', 
                                 'guard-support', 'robot', 'technician', 'diverter' ]
 
@@ -74,7 +74,7 @@ class MaskSH:
         if ladder_index in class_ids.tolist():
             ladder_bb = rois[class_label.index('ladder')]
             x1, x2, y1, y2 = ladder_bb
-            ladder_bb = np.zeros((480,640))
+            ladder_bb = np.zeros(self.shape)
             ladder_bb[x1:y1, x2:y2] = 75
             ladder_person = ladder_bb + mask_person
             s_l_p = len(np.where(ladder_person>100)[0]) * 100

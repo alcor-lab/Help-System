@@ -8,13 +8,15 @@ import numpy as np
 import cv2
 
 
-def displayResult(images_pack, label):
+def displayResult(images_pack, label, delay):
 
     # TODO the below fors can be vectorised for improved performance
     # TODO remove magic numbers
-    for id in range(images_pack.shape[1]-1,images_pack.shape[1]): #range(images_pack.shape[1]):
-        for fr in range(images_pack.shape[2]):
-                frame = images_pack[0, id, fr, :, :, :]
+    for s in range(images_pack.shape[1]-1, images_pack.shape[1]): #range(images_pack.shape[1]):
+        for fr in range(0,images_pack.shape[2],2):
+                frame = images_pack[0, s, fr, :, :, :]
+                # print(s, fr, images_pack.shape[2])
+                
                 # write white label, 1/2 of original font size, top left corner
                 # # of image, standard thickness (1)
                 cv2.putText(frame, label, (round(frame.shape[0] * 0.05),
@@ -22,7 +24,9 @@ def displayResult(images_pack, label):
                             cv2.FONT_HERSHEY_SIMPLEX,
                             0.6, (0xFF, 0xFF, 0xFF), 1)
                 cv2.imshow('Recognition results', frame)
-                cv2.waitKey(1)
+                key = cv2.waitKey(delay) & 0xFF
+    return key 
+
 
 
 class HelpWrapper(NetworkWrapper):
@@ -50,7 +54,7 @@ class HelpWrapper(NetworkWrapper):
         return self.help_softmax, self.now_softmax, self.next_softmax
 
     def get_predictions(self):
-        return self.help_pred_labels, self.y_pred_labels
+        return self.help_pred_labels, self.y_pred_labels, self.help_pred, self.y_pred
 
     def spin(self):
         t = threading.Thread(name='help_network', target=self._execute)
@@ -77,7 +81,7 @@ class HelpWrapper(NetworkWrapper):
             self.help_pred = np.expand_dims(np.argmax(self.help_softmax, axis=1), 0)
             self.help_pred_labels = [self.labels[i] for i in self.help_pred.tolist()[0]]            
 
-    def visualize(self):
+    def visualize(self, delay):
         if self.images_pack is not None:
             # printing outputs
             # print(self.help_pred_labels)
@@ -89,4 +93,8 @@ class HelpWrapper(NetworkWrapper):
             
             # frames/activity display
             if self.display:
-                displayResult(self.images_pack, self.y_pred_labels[-1])
+                key = displayResult(self.images_pack, self.y_pred_labels[-1], delay)
+                if key == ord('r'):
+                    # Press key `r` to reset network
+                    print("Resetting hidden state")
+                    self.nn.hidden_states_collection = {}

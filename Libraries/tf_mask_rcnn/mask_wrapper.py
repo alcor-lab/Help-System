@@ -26,7 +26,8 @@ class MaskWrapper(NetworkWrapper):
     def visualize(self):
         for elem in self.output.keys():
             print(elem, '--->', self.output[elem])
-        
+        print([self.class_list[x] for x in self.results[1]['class_ids']])
+        print([x for x in self.results[1]['scores']])
         # if self.output_proxy:
         #     pass
 
