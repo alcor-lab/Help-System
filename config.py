@@ -13,5 +13,6 @@ pre_class = 400
 encoder_lstm_layers = 2*[lstm_units]
 hidden_states_dim = lstm_units
 vocab_len = 34
+debug_frames = True
 
 test_video_path = 'dataset/Video/kit_dataset/TEST_VIDEOS'
