@@ -232,7 +232,8 @@ class ActivityNetwork:
                                                                                             self.h_input: h,
                                                                                             self.c_input: c,
                                                                                             self.obj_input: obj_tensor})
-
+        if config.debug_frames:
+            self.img_save_input(tensor, second_count)
         self.save_hidden_state(second_count, c_out, h_out)
 
         return now_softmax[0,:4,:], next_softmax, help_softmax[0,:3,:], c3d_softmax
@@ -253,5 +254,23 @@ class ActivityNetwork:
 
         return now_softmax, next_softmax, help_softmax, c3d_softmax
 
-    
+    def save_frame(self, frame_matrix, frame_per_step, sec_id):
+            frame_path = 'debug_frames/' + str(sec_id) + '_' + str(frame_per_step)
+            cv2.imwrite(frame_path + '_rgb.jpg',frame_matrix[:, :, :3])
+            # cv2.imwrite(frame_path + '_flow_1.jpg',frame_matrix[:, :, 5])
+            # cv2.imwrite(frame_path + '_flow_2.jpg',frame_matrix[:, :, 6])
+            # cv2.imwrite(frame_path + '_heatMat.jpg',frame_matrix[:, :, 3])
+            # cv2.imwrite(frame_path + '_pafMat.jpg',frame_matrix[:, :, 4])
+
+    def img_save_input(self, tensor, sec_id):
+        if not os.path.exists('debug_frames/'):
+            os.makedirs('debug_frames/')
+        shape_tensor = tensor.shape
+        print(shape_tensor)
+        for gr in range(3,4): #range(shape_tensor[2]):
+            for frame_per_step in range(shape_tensor[3]):
+                img_tensor = tensor[0, 0, gr, frame_per_step, ...]
+                # self.save_frame(img_tensor, frame_per_step, sec_id)
+                frame_path = 'debug_frames/' + str(sec_id) + '_' + str(gr) + '_' + str(frame_per_step)
+                cv2.imwrite(frame_path + '_rgb.jpg',img_tensor[:, :, :3])
 # activity_network = activity_network()

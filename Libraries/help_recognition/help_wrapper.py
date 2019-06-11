@@ -38,6 +38,8 @@ class HelpWrapper(NetworkWrapper):
         self.y_pred = None
         self.y_pred_labels = None
 
+        self.output = 0
+
         with self.sess.as_default(), self.sess.graph.as_default():
             self.nn = ActivityNetwork(self.meta_path, self.checkpoint_path, sess=self.sess, device=self.device)
 
@@ -49,6 +51,8 @@ class HelpWrapper(NetworkWrapper):
         self.images_list = images_list
         self.second = second
         self.objects = objects
+        
+        
 
     def get_data(self):
         return self.help_softmax, self.now_softmax, self.next_softmax
@@ -67,6 +71,17 @@ class HelpWrapper(NetworkWrapper):
         # processing images
         with self.sess.as_default(), self.sess.graph.as_default():
             x, x_mask = self.images_cache.process_images(self.images_pack, self.images_list)
+
+            # if self.output < 10:
+            #     print(x.shape)
+            #     for gr in range(3,4):
+            #         for fr in range(x.shape[3]):
+            #             frame = x[0,0,gr,fr,:,:, :3]
+            #             print(self.output, frame.shape)
+            #             cv2.imwrite('out/im_{}_{}_{}.png'.format(self.output, gr, fr), frame)
+            #     self.output += 1
+
+
             processing = time.time()
             self.now_softmax, self.next_softmax, self.help_softmax, _ = \
                 self.nn.compute_activity_given_tensor(x, self.second, self.objects)
