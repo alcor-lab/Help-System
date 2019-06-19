@@ -7,6 +7,9 @@ import time
 import matplotlib.pyplot as plt
 import numpy as np
 
+from PIL import Image
+
+
 class MaskWrapper(NetworkWrapper):
     def __init__(self, *args, **kwargs):
         super(MaskWrapper, self).__init__(*args, **kwargs)
@@ -37,6 +40,8 @@ class MaskWrapper(NetworkWrapper):
                                             self.class_list, r['scores'], pause=0.5, ax=self.ax)
 
     def set_data(self, images):
+        images = [im[:,:,::-1] for im in images]
+        images = [np.array(Image.fromarray(im).resize((int(1080*4/3),1080), resample=Image.BICUBIC)) for im in images]
         self.images = images
 
     def get_data(self):

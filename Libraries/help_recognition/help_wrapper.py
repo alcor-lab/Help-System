@@ -96,7 +96,11 @@ class HelpWrapper(NetworkWrapper):
             self.help_pred = np.expand_dims(np.argmax(self.help_softmax, axis=1), 0)
             self.help_pred_labels = [self.labels[i] for i in self.help_pred.tolist()[0]]            
 
+    def reset_hidden_state(self):
+        self.nn.hidden_states_collection = {}
+
     def visualize(self, delay):
+        key = None
         if self.images_pack is not None:
             # printing outputs
             # print(self.help_pred_labels)
@@ -113,3 +117,5 @@ class HelpWrapper(NetworkWrapper):
                     # Press key `r` to reset network
                     print("Resetting hidden state")
                     self.nn.hidden_states_collection = {}
+
+        return key
