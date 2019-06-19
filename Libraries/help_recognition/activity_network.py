@@ -225,6 +225,10 @@ class ActivityNetwork:
     def compute_activity_given_tensor(self, tensor, second_count, dict_obj):     
         # compute results from network given tensor and last second time count 
         c, h =self.retrieve_hidden_state(second_count)
+        
+        if config.debug_frames:
+            self.img_save_input(tensor, second_count)
+        
         obj_tensor = self.generate_obj_tensor(dict_obj)
         now_softmax, help_softmax, next_softmax, c3d_softmax, c_out, h_out = self.sess.run([self.now_softmax, self.help_softmax, self.next_softmax, self.c3d_softmax,
                                                                                 self.c_out, self.h_out],
@@ -232,8 +236,7 @@ class ActivityNetwork:
                                                                                             self.h_input: h,
                                                                                             self.c_input: c,
                                                                                             self.obj_input: obj_tensor})
-        if config.debug_frames:
-            self.img_save_input(tensor, second_count)
+
         self.save_hidden_state(second_count, c_out, h_out)
 
         return now_softmax[0,:4,:], next_softmax, help_softmax[0,:3,:], c3d_softmax
@@ -270,7 +273,14 @@ class ActivityNetwork:
         for gr in range(3,4): #range(shape_tensor[2]):
             for frame_per_step in range(shape_tensor[3]):
                 img_tensor = tensor[0, 0, gr, frame_per_step, ...]
-                # self.save_frame(img_tensor, frame_per_step, sec_id)
+                
                 frame_path = 'debug_frames/' + str(sec_id) + '_' + str(gr) + '_' + str(frame_per_step)
                 cv2.imwrite(frame_path + '_rgb.jpg',img_tensor[:, :, :3])
+                # cv2.imwrite(frame_path + '_flow_1.jpg',img_tensor[:, :, 5])
+                # cv2.imwrite(frame_path + '_flow_2.jpg',img_tensor[:, :, 6])
+                # cv2.imwrite(frame_path + '_heatMat.jpg',img_tensor[:, :, 3])
+                # cv2.imwrite(frame_path + '_pafMat.jpg',img_tensor[:, :, 4])
+
+                # self.save_frame(img_tensor, frame_per_step, sec_id)
+
 # activity_network = activity_network()

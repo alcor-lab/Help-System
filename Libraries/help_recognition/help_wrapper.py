@@ -78,7 +78,7 @@ class HelpWrapper(NetworkWrapper):
             #         for fr in range(x.shape[3]):
             #             frame = x[0,0,gr,fr,:,:, :3]
             #             print(self.output, frame.shape)
-            #             cv2.imwrite('out/im_{}_{}_{}.png'.format(self.output, gr, fr), frame)
+            #             cv2.imwrite('debug_frames/im_{}_{}_{}.png'.format(self.output, gr, fr), frame)
             #     self.output += 1
 
 
