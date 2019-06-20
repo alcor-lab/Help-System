@@ -60,9 +60,9 @@ class MaskWrapper(NetworkWrapper):
             self.output, self.results = self.nn.detect(self.images)
         end = time.time()
         
-        print('data retrieval time:{} secs'.format(preparation - start))
-        print('network time:{} secs'.format(end - preparation))
-        print('total time:{} secs'.format(end - start))
+        print('Mask data retrieval time:{} secs'.format(preparation - start))
+        print('Mask network time:{} secs'.format(end - preparation))
+        print('Mask total time:{} secs'.format(end - start))
             
 
 

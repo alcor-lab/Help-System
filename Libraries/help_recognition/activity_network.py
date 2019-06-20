@@ -269,7 +269,7 @@ class ActivityNetwork:
         if not os.path.exists('debug_frames/'):
             os.makedirs('debug_frames/')
         shape_tensor = tensor.shape
-        print(shape_tensor)
+        # print(shape_tensor)
         for gr in range(3,4): #range(shape_tensor[2]):
             for frame_per_step in range(shape_tensor[3]):
                 img_tensor = tensor[0, 0, gr, frame_per_step, ...]

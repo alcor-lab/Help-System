@@ -86,9 +86,9 @@ class HelpWrapper(NetworkWrapper):
             self.now_softmax, self.next_softmax, self.help_softmax, _ = \
                 self.nn.compute_activity_given_tensor(x, self.second, self.objects)
             end = time.time()
-            print('processing time:{} secs'.format(processing - start))
-            print('network time:{} secs'.format(end - processing))
-            print('total time:{} secs'.format(end - start))
+            print('Help processing time:{} secs'.format(processing - start))
+            print('Help network time:{} secs'.format(end - processing))
+            print('Help total time:{} secs'.format(end - start))
             
             self.y_pred = np.expand_dims(np.argmax(self.now_softmax, axis=1), 0)
             self.y_pred_labels = [self.labels[i] for i in self.y_pred.tolist()[0]]
