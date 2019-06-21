@@ -40,7 +40,7 @@ def test():
                 net.hidden_states_collection = {}
                 output_collection[path] = {}
                 video = cv2.VideoCapture(path)
-                video.set(cv2.CAP_PROP_POS_AVI_RATIO, 1)
+                video.set(cv2.CAP_PROP_POS_AVI_RATIO, 10)
                 framecount = int(video.get(cv2.CAP_PROP_FRAME_COUNT))
                 fps = int(video.get(cv2.CAP_PROP_FPS))
                 seconds = int(framecount/fps)
