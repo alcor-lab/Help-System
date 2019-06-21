@@ -183,8 +183,8 @@ def test():
                                 ret, im = video.read()
                                 im = cv2.resize(im, dsize=(out_width, out_height), interpolation=cv2.INTER_CUBIC)
 
-                                thickness = 2.5
-                                font_scale = 2.5
+                                thickness = 3
+                                font_scale = 3
 
                                 # color = BLUE_COLOR
                                 # text = 'Help: ' + action + ' ' + str(action_prob) 
