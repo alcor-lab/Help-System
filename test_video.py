@@ -106,6 +106,7 @@ def test():
                         
                         second_matrix = net.compound_second_frames(frames_collection)
                         second_collection.append(second_matrix)
+                        print(makis_collection.keys())
                         now_target = id_to_label[makis_collection[s]['now_label']]
                         # next_label = id_to_label[ordered_collection[path][s]['next_label']]
                         # help_label = id_to_label[ordered_collection[path][s]['help']]
