@@ -19,25 +19,22 @@ def load(name):
 
 def test():
         net = activity_network.activity_network()
-        test_collection = load('test_collection')
         id_to_word = load('id_to_word')
         word_to_id = load('word_to_id')
         id_to_label = load('id_to_label')
-        ordered_collection = load('ordered_collection')
+        makis_collection = load('demo_output_data')
         path_collection = []
         output_collection = {}
-        for key1 in test_collection.keys():
-                for key2 in test_collection[key1].keys():
-                        for key3 in test_collection[key1][key2].keys():
-                                for entry in test_collection[key1][key2][key3]:
-                                        video_name = entry['path']
-                                        if video_name not in path_collection:
-                                               path_collection.append(video_name)
+        for root, dirs, files in os.walk(config.demo_path_video):
+                for fl in files:
+                        path = root + '/' + fl
+                        path_collection.append(fl)
 
         pbar_video = tqdm(total=len(path_collection), leave=False, desc='Videos')
 
         RED_COLOR = (0,0,255)
         GREEN_COLOR = (0,255,0)
+        BLUE_COLOR = (255,0,0)
         print(path_collection)
         for path in path_collection:
                 net.hidden_states_collection = {}
@@ -85,9 +82,9 @@ def test():
                                 linspace_frame[-1] -= 2
 
                         extracted_frames = {}
-                        z = 0
+                        # z = 0
                         frames_collection = []
-                        segment = [int(linspace_frame[0]), int(linspace_frame[-1])+1]
+                        # segment = [int(linspace_frame[0]), int(linspace_frame[-1])+1]
                         for frame in range(int(linspace_frame[0]), int(linspace_frame[-1])+1):
                                 video.set(1, frame)
                                 ret, im = video.read()
@@ -109,15 +106,15 @@ def test():
                         
                         second_matrix = net.compound_second_frames(frames_collection)
                         second_collection.append(second_matrix)
-                        now_target = id_to_label[ordered_collection[path][s]['now_label']]
-                        next_label = id_to_label[ordered_collection[path][s]['next_label']]
-                        help_label = id_to_label[ordered_collection[path][s]['help']]
-                        sec_obj = ordered_collection[path][s]['obj_label']
-                        sec_id_obj = {}
-                        for obj in sec_obj.keys():
-                                position = word_to_id[obj]
-                                value = sec_obj[obj]
-                                sec_id_obj[position] = value
+                        now_target = id_to_label[makis_collection[s]['now_label']]
+                        # next_label = id_to_label[ordered_collection[path][s]['next_label']]
+                        # help_label = id_to_label[ordered_collection[path][s]['help']]
+                        sec_id_obj = makis_collection[s]['obj_label']
+                        # sec_id_obj = {}
+                        # for obj in sec_obj.keys():
+                        #         position = word_to_id[obj]
+                        #         value = sec_obj[obj]
+                        #         sec_id_obj[position] = value
 
                         obj_list.append(sec_id_obj)
                         if s >= 3:
@@ -137,8 +134,6 @@ def test():
                                 action = help_softmax[0,:]
                                 obj = help_softmax[1,:]
                                 place = help_softmax[2,:]
-
-                                pp.pprint(now_word)
 
                                 now_word_max = np.argmax(now_word, axis=0)
                                 c3d_word_max = np.argmax(c3d_word, axis=0)
@@ -166,17 +161,17 @@ def test():
                                 
                                 if now_word == now_target:
                                         correct_now += 1
-                                if c3d_word == now_target:
-                                        correct_c3d += 1
-                                if next_label == next_word:
-                                        correct_next += 1
-                                if help_label == help_word:
-                                        correct_help += 1
+                                # if c3d_word == now_target:
+                                #         correct_c3d += 1
+                                # if next_label == next_word:
+                                #         correct_next += 1
+                                # if help_label == help_word:
+                                #         correct_help += 1
 
-                                print('\n')
-                                print(' ', now_target, now_target, next_label, help_label)
-                                print(' ', now_word, c3d_word, next_word, action, obj, place)
-                                print('prep ', float(correct_now)/(s+1), float(correct_c3d)/(s+1), float(correct_next)/(s+1), float(correct_help)/(s+1))
+                                # print('\n')
+                                # print(' ', now_target, now_target, next_label, help_label)
+                                # print(' ', now_word, c3d_word, next_word, action, obj, place)
+                                # print('prep ', float(correct_now)/(s+1), float(correct_c3d)/(s+1), float(correct_next)/(s+1), float(correct_help)/(s+1))
                         
                         for frame in range(s*fps+1, (s+1)*fps+1):
                                 video.set(1, frame)
@@ -186,10 +181,7 @@ def test():
                                 thickness = 2
                                 font_scale = 2
 
-                                if help_label == help_word:
-                                        color = GREEN_COLOR
-                                else:
-                                        color = RED_COLOR
+                                color = BLUE_COLOR
                                 text = 'Help: ' + action + ' ' + str(action_prob) 
                                 cv2.putText(im, text ,(10,20),1,font_scale,color,thickness, bottomLeftOrigin=False)
                                 text = 'Help: '+ obj + ' ' + str(obj_prob)
@@ -204,21 +196,20 @@ def test():
                                 text = 'Now: ' + now_word + ' ' + str(now_prob) 
                                 cv2.putText(im, text ,(10,110),1,font_scale,color,thickness, bottomLeftOrigin=False)
 
-                                if next_label == next_word:
-                                        color = GREEN_COLOR
-                                else:
-                                        color = RED_COLOR
+                                color = BLUE_COLOR
                                 text = 'Next: ' + next_word + ' ' + str(next_prob)
                                 cv2.putText(im, text ,(10,140),1,font_scale,color,thickness, bottomLeftOrigin=False)
-                                
 
+                                text = 'Live Now: ' + now_target + ' ' + str(now_prob) 
+                                cv2.putText(im, text ,(10,170),1,font_scale,color,thickness, bottomLeftOrigin=False)
+                                
                                 out.write(im)
                         
                         pbar_second.update(1)
                 pbar_second.refresh()
                 pbar_second.clear()
                 pbar_second.close()
-                save(output_collection, 'output_collection')
+                # save(output_collection, 'output_collection')
                 pbar_video.update(1)
                 out.release()
 
