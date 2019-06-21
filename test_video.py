@@ -42,6 +42,7 @@ def test():
                 video = cv2.VideoCapture(path)
                 video.set(cv2.CAP_PROP_POS_AVI_RATIO, 10)
                 framecount = int(video.get(cv2.CAP_PROP_FRAME_COUNT))
+                print(framecount)
                 fps = int(video.get(cv2.CAP_PROP_FPS))
                 seconds = int(framecount/fps)
                 second_collection = []
