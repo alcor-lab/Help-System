@@ -18,6 +18,10 @@ class NetworkWrapper(ABC):
     def set_data():
         pass
 
+    def spin_once(self):
+        t = self.spin()
+        t.join()
+    
     @abstractmethod
     def get_data():
         pass

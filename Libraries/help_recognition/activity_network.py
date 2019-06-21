@@ -53,7 +53,7 @@ class ActivityNetwork:
         # load architecture in graph and weights in session and initialize
         with tf.device(device):
             self.graph = tf.get_default_graph()
-            self.architecture = tf.train.import_meta_graph(self._meta_graph, clear_devices=True)
+            self.architecture = tf.train.import_meta_graph(self._meta_graph, clear_devices=False)
         self.latest_ckp = tf.train.latest_checkpoint(self._checkpoint)
         
         # creating a Session
@@ -228,6 +228,7 @@ class ActivityNetwork:
         
         if config.debug_frames:
             self.img_save_input(tensor, second_count)
+            print("DEBUG|Input Dictionary:", dict_obj)
         
         obj_tensor = self.generate_obj_tensor(dict_obj)
         now_softmax, help_softmax, next_softmax, c3d_softmax, c_out, h_out = self.sess.run([self.now_softmax, self.help_softmax, self.next_softmax, self.c3d_softmax,
@@ -270,7 +271,7 @@ class ActivityNetwork:
             os.makedirs('debug_frames/')
         shape_tensor = tensor.shape
         # print(shape_tensor)
-        for gr in range(3,4): #range(shape_tensor[2]):
+        for gr in range(shape_tensor[2]):
             for frame_per_step in range(shape_tensor[3]):
                 img_tensor = tensor[0, 0, gr, frame_per_step, ...]
                 
@@ -279,7 +280,7 @@ class ActivityNetwork:
                 # cv2.imwrite(frame_path + '_flow_1.jpg',img_tensor[:, :, 5])
                 # cv2.imwrite(frame_path + '_flow_2.jpg',img_tensor[:, :, 6])
                 # cv2.imwrite(frame_path + '_heatMat.jpg',img_tensor[:, :, 3])
-                # cv2.imwrite(frame_path + '_pafMat.jpg',img_tensor[:, :, 4])
+                cv2.imwrite(frame_path + '_pafMat.jpg',img_tensor[:, :, 4])
 
                 # self.save_frame(img_tensor, frame_per_step, sec_id)
 

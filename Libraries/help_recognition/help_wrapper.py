@@ -25,7 +25,8 @@ def displayResult(images_pack, label, delay):
                             0.6, (0xFF, 0xFF, 0xFF), 1)
                 cv2.imshow('Recognition results', frame)
                 key = cv2.waitKey(delay) & 0xFF
-    return key 
+                # print("KEY PRESSED", key)
+                return key 
 
 
 
@@ -64,7 +65,7 @@ class HelpWrapper(NetworkWrapper):
         t = threading.Thread(name='help_network', target=self._execute)
         t.start()
         return t
-    
+
     def _execute(self):
         start = time.time()
 
@@ -86,9 +87,9 @@ class HelpWrapper(NetworkWrapper):
             self.now_softmax, self.next_softmax, self.help_softmax, _ = \
                 self.nn.compute_activity_given_tensor(x, self.second, self.objects)
             end = time.time()
-            print('Help processing time:{} secs'.format(processing - start))
-            print('Help network time:{} secs'.format(end - processing))
-            print('Help total time:{} secs'.format(end - start))
+            # print('Help processing time:{} secs'.format(processing - start))
+            # print('Help network time:{} secs'.format(end - processing))
+            # print('Help total time:{} secs'.format(end - start))
             
             self.y_pred = np.expand_dims(np.argmax(self.now_softmax, axis=1), 0)
             self.y_pred_labels = [self.labels[i] for i in self.y_pred.tolist()[0]]
@@ -98,6 +99,7 @@ class HelpWrapper(NetworkWrapper):
 
     def reset_hidden_state(self):
         self.nn.hidden_states_collection = {}
+        self.images_cache.cleanup_cache(0)
 
     def visualize(self, delay):
         key = None
@@ -115,7 +117,7 @@ class HelpWrapper(NetworkWrapper):
                 key = displayResult(self.images_pack, self.y_pred_labels[-1], delay)
                 if key == ord('r'):
                     # Press key `r` to reset network
-                    print("Resetting hidden state")
+                    print("\n\n---Resetting hidden state---\n\n")
                     self.nn.hidden_states_collection = {}
 
         return key

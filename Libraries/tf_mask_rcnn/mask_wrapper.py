@@ -21,6 +21,9 @@ class MaskWrapper(NetworkWrapper):
 
         self.output = None
         self.results = None
+        
+        self.data_ready = False
+        self._data_thread = None
 
         if self.display:
             self.ax = plt.axes()
@@ -40,9 +43,20 @@ class MaskWrapper(NetworkWrapper):
                                             self.class_list, r['scores'], pause=0.5, ax=self.ax)
 
     def set_data(self, images):
+        self._preprocess_data(images)
+    
+    def _preprocess_data(self, images):
+        self.data_ready = False
+        start = time.monotonic()
         images = [im[:,:,::-1] for im in images]
         images = [np.array(Image.fromarray(im).resize((int(1080*4/3),1080), resample=Image.BICUBIC)) for im in images]
+        # print("Mask Preprocessing time:",time.monotonic()-start)
         self.images = images
+        self.data_ready = True
+
+    def prepare_data(self, images):
+        self._data_thread = threading.Thread(target=self._preprocess_data, args=(images,))
+        self._data_thread.start()
 
     def get_data(self):
         return self.output, self.results
@@ -55,14 +69,23 @@ class MaskWrapper(NetworkWrapper):
     def _execute(self):
         start = time.time()
             
+        if self._data_thread:
+            self._data_thread.join()
+            self._data_thread = None
+
+        if not self.data_ready: 
+            self.output = None
+            self.results = None
+            return
+
         preparation = time.time()
         with self.sess.as_default(), self.sess.graph.as_default(): 
-            self.output, self.results = self.nn.detect(self.images)
+            self.output, self.results = self.nn.detect(self.images.copy())
         end = time.time()
         
-        print('Mask data retrieval time:{} secs'.format(preparation - start))
-        print('Mask network time:{} secs'.format(end - preparation))
-        print('Mask total time:{} secs'.format(end - start))
+        # print('Mask data retrieval time:{} secs'.format(preparation - start))
+        # print('Mask network time:{} secs'.format(end - preparation))
+        # print('Mask total time:{} secs'.format(end - start))
             
 
 
