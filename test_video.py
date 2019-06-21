@@ -28,7 +28,7 @@ def test():
         for root, dirs, files in os.walk(config.demo_path_video):
                 for fl in files:
                         path = root + '/' + fl
-                        path_collection.append(fl)
+                        path_collection.append(path)
 
         pbar_video = tqdm(total=len(path_collection), leave=False, desc='Videos')
 
@@ -40,9 +40,8 @@ def test():
                 net.hidden_states_collection = {}
                 output_collection[path] = {}
                 video = cv2.VideoCapture(path)
-                video.set(cv2.CAP_PROP_POS_AVI_RATIO, 10)
+                video.set(cv2.CAP_PROP_POS_AVI_RATIO, 1)
                 framecount = int(video.get(cv2.CAP_PROP_FRAME_COUNT))
-                print(framecount)
                 fps = int(video.get(cv2.CAP_PROP_FPS))
                 seconds = int(framecount/fps)
                 second_collection = []
