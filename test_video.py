@@ -112,7 +112,7 @@ def test():
                                         flow = net.compute_optical_flow(im, im_prev)
                                         pafMat, heatMat = net.compute_pose(im)
                                         frame_processed = net.compound_channel(im, flow, heatMat, pafMat)
-                                        save_frame(frame_processed, 'check_order_test/')
+                                        save_frame(frame_processed, 'check_order_test/'+str(frame))
                                         frames_collection.append(frame_processed)
                         
                         second_matrix = net.compound_second_frames(frames_collection)
