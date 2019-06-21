@@ -200,8 +200,8 @@ class activity_network:
         h = np.zeros(shape=(1, len(config.encoder_lstm_layers), 1, config.hidden_states_dim), dtype=float)
         retrieve_id = second_id - config.seq_len 
         if retrieve_id in self.hidden_states_collection.keys():
-            c[0, :, 0, :] = self.hidden_states_collection[retrieve_id]['c']
-            h[0, :, 0, :] = self.hidden_states_collection[retrieve_id]['h']
+            c[0, :, :, :] = self.hidden_states_collection[retrieve_id]['c']
+            h[0, :, :, :] = self.hidden_states_collection[retrieve_id]['h']
         else:
             print('\nATTENTION: hiddend state not found')
         return c, h
