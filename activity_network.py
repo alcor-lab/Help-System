@@ -250,8 +250,8 @@ class activity_network:
         cv2.imwrite(frame_path + '_rgb.jpg',frame_matrix[:, :, :3])
         cv2.imwrite(frame_path + '_flow_1.jpg',frame_matrix[:, :, 5])
         cv2.imwrite(frame_path + '_flow_2.jpg',frame_matrix[:, :, 6])
-        cv2.imwrite(frame_path + '_heatMat.jpg',frame_matrix[:, :, 3])
-        cv2.imwrite(frame_path + '_pafMat.jpg',frame_matrix[:, :, 4])
+        cv2.imwrite(frame_path + '_heatMat_CH3.jpg',frame_matrix[:, :, 3])
+        cv2.imwrite(frame_path + '_pafMat_CH4.jpg',frame_matrix[:, :, 4])
 
     def img_save_input(self, tensor, sec_id):
         if not os.path.exists('debug_frames/'):
