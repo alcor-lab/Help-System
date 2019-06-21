@@ -23,11 +23,12 @@ def test():
         word_to_id = load('word_to_id')
         id_to_label = load('id_to_label')
         makis_collection = load('demo_output_data')
+        makis_start_sec = min(makis_collection.keys())
         path_collection = []
         output_collection = {}
         for root, dirs, files in os.walk(config.demo_path_video):
                 for fl in files:
-                        path = root + '/' + fl
+                        path = root + fl
                         path_collection.append(path)
 
         pbar_video = tqdm(total=len(path_collection), leave=False, desc='Videos')
@@ -106,11 +107,11 @@ def test():
                         
                         second_matrix = net.compound_second_frames(frames_collection)
                         second_collection.append(second_matrix)
-                        print(makis_collection.keys())
-                        now_target = id_to_label[makis_collection[s]['now_label']]
+                        print(makis_collection[makis_start_sec].keys())
+                        now_target = id_to_label[makis_collection[makis_start_sec + s]['now_label']]
                         # next_label = id_to_label[ordered_collection[path][s]['next_label']]
                         # help_label = id_to_label[ordered_collection[path][s]['help']]
-                        sec_id_obj = makis_collection[s]['obj_label']
+                        sec_id_obj = makis_collection[makis_start_sec + s]['obj_label']
                         # sec_id_obj = {}
                         # for obj in sec_obj.keys():
                         #         position = word_to_id[obj]
