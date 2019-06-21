@@ -23,7 +23,7 @@ def test():
         word_to_id = load('word_to_id')
         id_to_label = load('id_to_label')
         makis_collection = load('demo_output_data')
-        makis_start_sec = min(makis_collection.keys())
+        makis_start_sec = min(makis_collection['now_sm'].keys())
         path_collection = []
         output_collection = {}
         for root, dirs, files in os.walk(config.demo_path_video):
@@ -107,11 +107,10 @@ def test():
                         
                         second_matrix = net.compound_second_frames(frames_collection)
                         second_collection.append(second_matrix)
-                        print(makis_collection.keys())
                         pp.pprint(makis_collection.keys())
                         pp.pprint(makis_collection['now_sm'].keys())
                         pp.pprint(makis_collection['obj_label'].keys())
-                        now_live_softmax = makis_collection['now_sm'][str(makis_start_sec + s)]
+                        now_live_softmax = makis_collection['now_sm'][makis_start_sec + s]
                         now_live_max = np.argmax(now_live_softmax, axis=0)
                         now_target = id_to_word[now_live_max]
                         # next_label = id_to_label[ordered_collection[path][s]['next_label']]
