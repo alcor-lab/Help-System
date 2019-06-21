@@ -115,7 +115,7 @@ def test():
                         now_target = id_to_word[now_live_max]
                         # next_label = id_to_label[ordered_collection[path][s]['next_label']]
                         # help_label = id_to_label[ordered_collection[path][s]['help']]
-                        sec_id_obj = makis_collection['obj_label'][makis_start_sec + s]
+                        sec_id_obj = makis_collection['obj_label'][makis_start_sec + s][0]
                         # sec_id_obj = {}
                         # for obj in sec_obj.keys():
                         #         position = word_to_id[obj]
