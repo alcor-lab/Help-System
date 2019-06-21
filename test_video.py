@@ -36,6 +36,7 @@ def test():
         RED_COLOR = (0,0,255)
         GREEN_COLOR = (0,255,0)
         BLUE_COLOR = (255,0,0)
+        YELLOW_COLOR = (255,255,0)
         print(path_collection)
         for path in path_collection:
                 net.hidden_states_collection = {}
@@ -203,6 +204,7 @@ def test():
                                 text = 'Next: ' + next_word + ' ' + str(next_prob)
                                 cv2.putText(im, text ,(10,140),1,font_scale,color,thickness, bottomLeftOrigin=False)
 
+                                color = YELLOW_COLOR
                                 text = 'Live Now: ' + now_target + ' ' + str(now_prob) 
                                 cv2.putText(im, text ,(10,170),1,font_scale,color,thickness, bottomLeftOrigin=False)
                                 
