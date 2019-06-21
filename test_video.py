@@ -107,11 +107,13 @@ def test():
                         
                         second_matrix = net.compound_second_frames(frames_collection)
                         second_collection.append(second_matrix)
-                        print(makis_collection[makis_start_sec].keys())
-                        now_target = id_to_label[makis_collection[makis_start_sec + s]['now_label']]
+                        print(makis_collection.keys())
+                        now_live_softmax = id_to_label[makis_collection['now_label'][makis_start_sec + s]]
+                        now_live_max = np.argmax(now_live_softmax, axis=0)
+                        now_target = id_to_word[now_live_max]
                         # next_label = id_to_label[ordered_collection[path][s]['next_label']]
                         # help_label = id_to_label[ordered_collection[path][s]['help']]
-                        sec_id_obj = makis_collection[makis_start_sec + s]['obj_label']
+                        sec_id_obj = makis_collection['obj_label'][makis_start_sec + s]
                         # sec_id_obj = {}
                         # for obj in sec_obj.keys():
                         #         position = word_to_id[obj]
