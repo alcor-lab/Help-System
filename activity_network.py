@@ -245,8 +245,8 @@ class activity_network:
 
         return now_softmax, next_softmax, help_softmax, c3d_softmax
 
-    def save_frame(self, frame_matrix, sec_id):
-        frame_path = 'debug_frames/' + str(sec_id)
+    def save_frame(self, frame_matrix, sec_id, frame_per_step):
+        frame_path = 'debug_frames/' + str(sec_id) + '_' + str(frame_per_step)
         cv2.imwrite(frame_path + '_rgb.jpg',frame_matrix[:, :, :3])
         cv2.imwrite(frame_path + '_flow_1.jpg',frame_matrix[:, :, 5])
         cv2.imwrite(frame_path + '_flow_2.jpg',frame_matrix[:, :, 6])
@@ -257,6 +257,7 @@ class activity_network:
         if not os.path.exists('debug_frames/'):
             os.makedirs('debug_frames/')
         shape_tensor = tensor.shape
-        for frame_per_step in shape_tensor[3]:
+        print(shape_tensor)
+        for frame_per_step in shape_tensor[2]:
             img_tensor = tensor[0, 0, -1, frame_per_step, ...]
-            self.save_frame(img_tensor, sec_id)
+            self.save_frame(img_tensor, sec_id, frame_per_step)
