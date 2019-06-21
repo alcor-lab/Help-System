@@ -17,6 +17,13 @@ def load(name):
     with open('dataset/' + name + '.pkl', 'rb') as f:
         return pickle.load(f)
 
+def save_frame(frame_matrix, frame_path):
+        cv2.imwrite(frame_path + '_rgb.jpg',frame_matrix[:, :, :3])
+        cv2.imwrite(frame_path + '_flow_1.jpg',frame_matrix[:, :, 5])
+        cv2.imwrite(frame_path + '_flow_2.jpg',frame_matrix[:, :, 6])
+        cv2.imwrite(frame_path + 'OP_CH1.jpg',frame_matrix[:, :, 3])
+        cv2.imwrite(frame_path + 'OP_CH2.jpg',frame_matrix[:, :, 4])
+
 def test():
         net = activity_network.activity_network()
         test_collection = load('test_collection')
@@ -105,6 +112,7 @@ def test():
                                         flow = net.compute_optical_flow(im, im_prev)
                                         pafMat, heatMat = net.compute_pose(im)
                                         frame_processed = net.compound_channel(im, flow, heatMat, pafMat)
+                                        save_frame(frame_processed, 'check_order_test/')
                                         frames_collection.append(frame_processed)
                         
                         second_matrix = net.compound_second_frames(frames_collection)
