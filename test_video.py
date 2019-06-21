@@ -107,9 +107,6 @@ def test():
                         
                         second_matrix = net.compound_second_frames(frames_collection)
                         second_collection.append(second_matrix)
-                        pp.pprint(makis_collection.keys())
-                        pp.pprint(makis_collection['now_sm'].keys())
-                        pp.pprint(makis_collection['obj_label'].keys())
                         now_live_softmax = makis_collection['now_sm'][makis_start_sec + s][-1,:]
                         now_live_max = np.argmax(now_live_softmax, axis=0)
                         now_target = id_to_word[now_live_max]
