@@ -110,7 +110,7 @@ def test():
                         pp.pprint(makis_collection.keys())
                         pp.pprint(makis_collection['now_sm'].keys())
                         pp.pprint(makis_collection['obj_label'].keys())
-                        now_live_softmax = makis_collection['now_sm'][makis_start_sec + s]
+                        now_live_softmax = makis_collection['now_sm'][makis_start_sec + s][-1,:]
                         now_live_max = np.argmax(now_live_softmax, axis=0)
                         now_target = id_to_word[now_live_max]
                         # next_label = id_to_label[ordered_collection[path][s]['next_label']]
