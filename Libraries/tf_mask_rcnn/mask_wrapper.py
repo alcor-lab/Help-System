@@ -29,17 +29,24 @@ class MaskWrapper(NetworkWrapper):
             self.ax = plt.axes()
 
 
-    def visualize(self):
-        for elem in self.output.keys():
-            print(elem, '--->', self.output[elem])
-        print([self.class_list[x] for x in self.results[1]['class_ids']])
-        print([x for x in self.results[1]['scores']])
+    def visualize(self, ind=1):
+        # for elem in self.output.keys():
+        #     print(elem, '--->', self.output[elem])
+        # print([self.class_list[x] for x in self.results[1]['class_ids']])
+        # print([x for x in self.results[1]['scores']])
         # if self.output_proxy:
         #     pass
 
+        objects = ['torch', 'cloth', 'cutter', 'spray_bottle','location']
+        for obj in objects:
+            if obj in self.output:
+                print('{}: {}'.format(obj,  self.output[obj]))
+            else:
+                print('{}: no-object'.format(obj))
+
         if self.display:
-            r = self.results[0]
-            visualize.display_instances(self.images[0], r['rois'], r['masks'], r['class_ids'],
+            r = self.results[ind]
+            visualize.display_instances(self.images[ind], r['rois'], r['masks'], r['class_ids'],
                                             self.class_list, r['scores'], pause=0.5, ax=self.ax)
 
     def set_data(self, images):
@@ -49,13 +56,15 @@ class MaskWrapper(NetworkWrapper):
         self.data_ready = False
         start = time.monotonic()
         images = [im[:,:,::-1] for im in images]
-        images = [np.array(Image.fromarray(im).resize((int(1080*4/3),1080), resample=Image.BICUBIC)) for im in images]
+        images = [np.array(Image.fromarray(im).resize(self.nn.shape[::-1], resample=Image.BICUBIC)) for im in images]
         # print("Mask Preprocessing time:",time.monotonic()-start)
         self.images = images
         self.data_ready = True
 
     def prepare_data(self, images):
-        self._data_thread = threading.Thread(target=self._preprocess_data, args=(images,))
+        self._data_thread = threading.Thread(name='mask_data_loader',
+                                            target=self._preprocess_data, 
+                                            args=(images,))
         self._data_thread.start()
 
     def get_data(self):
@@ -69,7 +78,8 @@ class MaskWrapper(NetworkWrapper):
     def _execute(self):
         start = time.time()
             
-        if self._data_thread:
+        if self._data_thread and self._data_thread.is_alive():
+            print("closing mask data thread")
             self._data_thread.join()
             self._data_thread = None
 

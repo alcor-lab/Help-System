@@ -37,23 +37,20 @@ class MaskSH:
             self.sess.run(tf.global_variables_initializer())
             self.saver.restore(self.sess, self.latest_ckp)
 
-    def wheresWaldo(self, r, class_label_gt):
+    def wheresWaldo(self, r, class_label_gt, person_index):
         rois = r['rois']
         class_ids = r['class_ids']
         class_label = [self.class_list[i] for i in class_ids]
         masks = r['masks']
         masks = np.transpose(masks, (2,0,1))
 
-        person_index = class_label_gt.index('technician')
         diverter_index = class_label_gt.index('diverter')
         ladder_index = class_label_gt.index('ladder')
-        if person_index not in class_ids.tolist():
-            return "No person"
-        if diverter_index not in class_ids.tolist():
-            return "No diverter"
+              
+        
 
         mask_person = np.zeros(self.shape)
-        mask_person = np.where(masks[class_label.index('technician'), :, :]==True,50, mask_person)
+        mask_person = np.where(masks[person_index, :, :]==True,50, mask_person)
 
         diverter_bb = rois[class_label.index('diverter')]
         x1, x2, y1, y2 = diverter_bb
@@ -84,10 +81,21 @@ class MaskSH:
             return "Technician on the Ladder"
         if s_ed_p < 15:
             return "Technician next to Guard"
+        '''
         if s_d_p < 15 and s_ed_p > 70:
-            return "Technician under Diverter"
+            return "unsure_location"
         else:
             return [s_ed_p, s_d_p, s_l_p]
+        '''
+        return 'The Location is NOT sure (maybe under_diverter case)'
+
+    def where_index(self, list_to_inspect, element):
+        ret = []
+        for index in range(len(list_to_inspect)):
+            if list_to_inspect[index] == element:
+                ret.append(index)
+        return ret
+
 
     def detect(self, images):
         result = self.model.shDetect(images, verbose=1)
@@ -95,9 +103,35 @@ class MaskSH:
         r  = result[0]
         for i in range(len(r['class_ids'])):
             output[self.class_list[r['class_ids'][i]]] = r['scores'][i]
+        
 
         #Technician Location
-        output['location'] = self.wheresWaldo(result[1], self.class_list)
+        r = result[1]
+        class_ids = r['class_ids']
+        class_label = [self.class_list[i] for i in class_ids]
+
+        person_index = self.class_list.index('technician')
+        diverter_index = self.class_list.index('diverter')
+        ladder_index = self.class_list.index('ladder')
+        
+        if person_index not in class_ids.tolist():
+            output['location'] = "No person"
+        elif diverter_index not in class_ids.tolist():
+            output['location'] = "No diverter"
+        elif class_ids.tolist().count(person_index) == 1:
+            index = class_ids.tolist().index(person_index)
+            output['location'] = self.wheresWaldo(result[1], self.class_list, index)
+        elif class_ids.tolist().count(person_index) > 1:
+            person_indices = self.where_index(class_ids.tolist(), person_index)
+            locations = []
+            right_location = 'unsure_location'
+            valid_locations = ["Technician on the Ladder",  "Technician next to Guard"]
+            for index in person_indices:
+                locations.append(self.wheresWaldo(result[1], self.class_list, index))
+            for location in locations:
+                if location in valid_locations:
+                    right_location = location
+            output['location'] = location
 
         return output, result
     

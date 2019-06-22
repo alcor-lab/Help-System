@@ -19,7 +19,7 @@ get:
       - pillow
       - scipy
       - sklearn
-#      - pandas
+      - pandas
       - pycocotools
       - scikit-image
       - tqdm
