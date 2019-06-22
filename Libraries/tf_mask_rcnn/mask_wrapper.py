@@ -62,26 +62,26 @@ class MaskWrapper(NetworkWrapper):
         self.data_ready = True
 
     def prepare_data(self, images):
-        self._data_thread = threading.Thread(name='mask_data_loader',
+        t = threading.Thread(name='mask_data_loader',
                                             target=self._preprocess_data, 
                                             args=(images,))
-        self._data_thread.start()
+        t.start()                                            
+        return t
 
     def get_data(self):
         return self.output, self.results
 
     def spin(self):
+        # if self._data_thread:
+        #     print("closing mask data thread")
+        #     self._data_thread.join()
+        #     self._data_thread = None
         t = threading.Thread(name='mask_network', target=self._execute)
         t.start()
         return t
 
     def _execute(self):
         start = time.time()
-            
-        if self._data_thread and self._data_thread.is_alive():
-            print("closing mask data thread")
-            self._data_thread.join()
-            self._data_thread = None
 
         if not self.data_ready: 
             self.output = None

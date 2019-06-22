@@ -16,6 +16,8 @@ import json
 import re
 import sys
 
+import operator
+
 from help_refinement.loadPars import *
 
 "The query algorithm:"
@@ -377,25 +379,25 @@ def get_objs_not_on_table(obj_state,past, table):
 
 ### modified  /changed
 def get_where_is(where_is, where, past):
-    where_is_flat =  list(itertools.chain(*where_is))
+    where_appo = where.copy()
+    where_appo.append('is_empty')
+    where_is_bis =where_is.copy()
+    for kk in range(past):
+        if is_empty(where_is_bis[kk]):
+            where_is_bis[kk] = {'is_empty':1.0}
+    where_is_flat =  list(itertools.chain(*where_is_bis))
     where_occ = {value: len(list(freq)) for value, freq in groupby(sorted(where_is_flat))}
-    known_pos = []
-    not_known_pos = []
-    freqwh = np.zeros(len(where))
-    for ii in range(len(where)):
-        xx = where[ii]
+    
+    for ii in range(len(where_appo)):
+        xx = where_appo[ii]
         value = where_occ.get(xx, "empty")
         if value == 'empty':
-            not_known_pos.append(xx)
-            print('not known is', xx)
-        else:
-           freqwh[ii] = where_occ.get(xx)
-    probw = freqwh/sum(freqwh)
-    if np.sum(probw) > 0:
-        vmax =np.int(np.argmax(probw))
-        true_location  = where[np.int(np.argmax(probw))]
-    else:     
-       true_location = 'unknown'
+            where_occ[xx]=0
+            
+    stat = max(where_occ.items(), key=operator.itemgetter(1))[0]
+    if stat == 'is_empty':
+        true_location = 'unknown'
+    else: true_location = stat
     return true_location
 
 "actions transtions "
@@ -478,27 +480,54 @@ def check_alternatives2(state_now,pred_h_n,data_act,last_help):
                         print(poss_dec, 'last else next_help_e', next_help_e)
         return poss_dec
 
-def check_alternatives3(state_now,k_location,last_help_splitted,prior_help_w, current_help):
+           
+def check_alternatives3(state_now,k_location,last_help,prior_help_w, current_help):
     print('alternative 3')
     poss_help = []
-    if k_location!= 'unknown':############# changed
-           print("k_location know")
+    if k_location != 'unknown':############# changed
+           print("k_location know", k_location)
            loc = consist_loc[k_location]
-           print("CURRENT_HELP", current_help)
-           if vocab_help[7] == current_help:
-                poss_help = []
-           else: 
-               "this can be also two"
-               poss_help = list(set.difference(getset(np.arange(0,8)),getset(loc)))
-               "this can be only one"
-    if not(is_empty(state_now)):
-        print("non empty state_now")
-        if type(state_now) == list:
-            state_now = state_now[0]
-        hold_obj = consist_obj[state_now]
-        poss_help = list(set.difference(getset(np.arange(0,8)),getset(hold_obj)))
-            
-    return poss_help
+           vals_loc = list(set.difference(getset(np.arange(0,8)),getset(loc)))
+           if len(vals_loc) > 1:
+               "only one of them"
+               if is_empty(state_now):
+                       poss_help = vocab_help[vals_loc[0]]
+                       poss_help2 = vocab_help[vals_loc[1]]
+               else:
+                       poss_help = vocab_help[vals_loc[1]]
+                       poss_help2 = vocab_help[vals_loc[0]]
+           if len(vals_loc) == 1:   
+              if vocab_help[7] == current_help and k_location == 'at_guard_support':
+                poss_help =  'nah'
+                poss_help2 = 'nah'
+              elif vocab_help[7] != current_help and k_location == 'at_guard_support':
+                poss_help = vocab_help[vals_loc[0]]
+                poss_help2 = vocab_help[0]
+    if not(is_empty(poss_help)):
+        if poss_help == 'nah' and poss_help2 == 'nah':
+            poss_dec = poss_help
+            poss_dec2 = poss_help
+        if set.issubset(getset(poss_help),getset(last_help)):
+           poss_dec ='nah'
+           poss_dec2 = 'nah'
+        else: 
+            poss_dec = poss_help
+            poss_dec2 = poss_help2
+    if k_location == 'unknown' and is_empty(poss_help):
+        if state_now == 'torch':
+           if vocab_help[0] in last_help:
+               poss_dec = vocab_help[5]
+               poss_dec2 = vocab_help[4]
+           else: poss_help =[]
+        if state_now == 'cloth':
+           if vocab_help[6] in last_help:
+               poss_dec = vocab_help[1]
+               poss_dec2 = vocab_help[5]
+           else: poss_help =[]
+    if poss_help == []:
+        poss_dec = vocab_help[0]
+        poss_dec2 = vocab_help[4]
+    return poss_dec, poss_dec2
 
 def choose_poss_help(cc,last_help,state_now):
     poss_help = []
@@ -594,6 +623,8 @@ def compute_help(help_answer_stack,now_softmax,help_softmax,obj_state,where_is, 
 ##      
         "set some parameters"
         poss_dec =[]
+        poss_dec1 = []
+        poss_dec2 = []
         net_predicted_help =[]
         help_pred_stack = []
         
@@ -609,6 +640,7 @@ def compute_help(help_answer_stack,now_softmax,help_softmax,obj_state,where_is, 
         if 'cutter' in state_now:
             state_now = []
         at_location = get_where_is(where_is, where, past)
+        print(at_location)
         counts2,pp = compute_argmax_max(data_help,0)
         uu =(-counts2[:,1]).argsort()[:3] 
         net_predicted_help_L = [id_to_word[x] for x in counts2[uu,0]]
@@ -623,39 +655,41 @@ def compute_help(help_answer_stack,now_softmax,help_softmax,obj_state,where_is, 
         "then exit with help_net_predicted"
         
         preds_h_n = np.where(help_trans[num_h,:]>0)[0]
+        best_vals =(-help_trans[num_h,:]).argsort()[:2] 
         preds_vals = [help_trans[num_h,int(x)] for x in preds_h_n]
         prior_help_w = get_names(preds_h_n,vocab_help)
+        
+        
         done_trans = list(set.difference(getset(prior_help_w),getset(last_help)))
-        print("DONE_TRANS",done_trans)
         if len(done_trans) == 1 and type(done_trans)==list:
-            poss_dec = done_trans[0]
+            poss_dec1 = done_trans[0]
+            n_b = voc_help_to_num[done_trans[0]]
+            sec = list(set.difference(getset(best_vals),getset(n_b)))
+            poss_dec2 = vocab_help[sec[0]]
         elif len(done_trans) == 1 and type(done_trans)!=list:
-            poss_dec = done_trans
-        elif set.issubset(getset(net_predicted_help),getset(last_help)):
-           done = True
-           poss_dec = 'nah'
+            poss_dec1 = done_trans
+            n_b = voc_help_to_num[done_trans[0]]
+            sec = list(set.difference(getset(best_vals),getset(n_b)))
+            poss_dec2 = vocab_help[sec[0]]
+#        elif set.issubset(getset(net_predicted_help),getset(last_help)):
+#           done = True
+#           poss_dec = 'nah'
+        ### Modified
         
-        if is_empty(poss_dec):    
-           alt_x = check_alternatives3(state_now,at_location,last_help_splitted,prior_help_w,curr_help)
-           if not(is_empty(alt_x)) and len(alt_x)==1:
-               poss_h = vocab_help[alt_x[0]]
-               done = set.issubset(getset(pos_h), getset(last_help))
-               if done:
-                   poss_dec = 'nah'
-               else:
-                   poss_dec = poss_h
-           elif not(is_empty(alt_x)) and len(alt_x)>1:
-                poss_dec = choose_poss_help(alt_x,last_help,state_now)
-#
-           else: poss_dec ='nah'
+            
+        if is_empty(poss_dec1):    
+           poss_dec1,poss_dec2 = check_alternatives3(state_now,at_location,last_help,prior_help_w,curr_help)
+           if is_empty(poss_dec1):
+               poss_dec1 = 'nah'
+               poss_dec2 ='nah'
+               print('empty poss dec')
              
-##
-    print('alla fine: ', poss_dec) 
-    values = build_vals(poss_dec,preds_h_n,prior_help_w,num_h)  
+##  changed
+    print('In the end: first choice = ', poss_dec1, 'second_choice =', poss_dec2) 
+#    values = build_vals(poss_dec,preds_h_n,prior_help_w,num_h)  
+#    idx =[i for i,x in enumerate(values0) if type(x) == list] 
+#    values[idx[0]] = values[idx[0]][0]
+    values = list([poss_dec1,poss_dec2])
     
-    # if type(values) == list:
-    #     idx =[i for i,x in enumerate(values)] 
-    #     values[idx[0]] = values[idx[0]]
-        
     help_pred_stack= dict(zip(keys_pred, list(values)))   
     return help_pred_stack
