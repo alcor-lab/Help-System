@@ -24,6 +24,10 @@ def test():
         id_to_label = load('id_to_label')
         makis_collection = load('demo_output_data')
         pp.pprint(makis_collection['obj_label'])
+        for sec in makis_collection['obj_label']:
+                print(sec)
+                for el in makis_collection['obj_label'][sec]:
+                        print(el)
         makis_start_sec = min(makis_collection['now_sm'].keys())
         path_collection = []
         output_collection = {}
