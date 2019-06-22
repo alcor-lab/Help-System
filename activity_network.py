@@ -142,8 +142,9 @@ class activity_network:
         for indx in range(len(dict_obj)):
             obj = dict_obj[indx]
             for obj_id in obj:
+                prob = obj[obj_id]
                 obj_id = random.choice(list(range(0,33)))
-                obj_input[0,0,indx,obj_id] = obj[obj_id]
+                obj_input[0,0,indx,obj_id] = prob
         
         return obj_input
 
