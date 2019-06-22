@@ -60,6 +60,7 @@ def test():
                 out = cv2.VideoWriter('dataset/results/'+ path.split('/')[-1],fourcc, fps, (out_width,out_height))
         
                 now_word = ''
+                c3d_word = ''
                 next_word = ''
                 action = ''
                 help_word = ''
@@ -136,8 +137,6 @@ def test():
                                 action = help_softmax[0,:]
                                 obj = help_softmax[1,:]
                                 place = help_softmax[2,:]
-
-                                pp.pprint(now_word)
 
                                 now_word_max = np.argmax(now_word, axis=0)
                                 c3d_word_max = np.argmax(c3d_word, axis=0)

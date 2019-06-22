@@ -60,6 +60,7 @@ def test():
                 out = cv2.VideoWriter('dataset/results/'+ path.split('/')[-1],fourcc, fps, (out_width,out_height))
         
                 now_word = ''
+                c3d_word = ''
                 next_word = ''
                 action = ''
                 help_word = ''
