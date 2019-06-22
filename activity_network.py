@@ -2,6 +2,7 @@
 import logging
 import logging.config
 from logging.config import dictConfig
+import random
 import os
 logging_config = dict(
     version = 1,
@@ -141,6 +142,7 @@ class activity_network:
         for indx in range(len(dict_obj)):
             obj = dict_obj[indx]
             for obj_id in obj:
+                obj_id = random.choice(list(range(0,33)))
                 obj_input[0,0,indx,obj_id] = obj[obj_id]
         
         return obj_input
