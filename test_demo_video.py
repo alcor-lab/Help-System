@@ -210,7 +210,12 @@ def test():
                                 text = 'Next: ' + next_word + ' ' + str(next_prob)
                                 cv2.putText(im, text ,(10,140),1,font_scale,color,thickness, bottomLeftOrigin=False)
                                 
-
+                                if c3d_word == now_target:
+                                        color = GREEN_COLOR
+                                else:
+                                        color = RED_COLOR
+                                text = 'Next: ' + c3d_word + ' ' + str(c3d_prob)
+                                cv2.putText(im, text ,(10,170),1,font_scale,color,thickness, bottomLeftOrigin=False)
                                 out.write(im)
                         
                         pbar_second.update(1)

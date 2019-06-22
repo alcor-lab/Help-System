@@ -208,6 +208,9 @@ def test():
                                 color = BLUE_COLOR
                                 text = 'Live Now: ' + now_target + ' ' + str(now_target_prob) 
                                 cv2.putText(im, text ,(10,170),1,font_scale,color,thickness, bottomLeftOrigin=False)
+                                color = BLUE_COLOR
+                                text = 'c3d_word Now: ' + c3d_word + ' ' + str(c3d_prob) 
+                                cv2.putText(im, text ,(10,200),1,font_scale,color,thickness, bottomLeftOrigin=False)
                                 
                                 out.write(im)
                         
