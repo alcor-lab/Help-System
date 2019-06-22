@@ -122,12 +122,7 @@ def test():
                                 position = word_to_id[obj]
                                 value = sec_obj[obj]
                                 sec_id_obj[position] = value
-                        
-                        for obj_id in sec_obj:
-                                prob = obj[obj_id]
-                                obj_id = random.choice(list(range(0,33)))
-                                sec_obj[obj_id] = prob
-                                
+
                         sec_id_obj = makis_collection['obj_label'][makis_start_sec + s]
 
                         obj_list.append(sec_id_obj)
