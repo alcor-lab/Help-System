@@ -23,6 +23,7 @@ def test():
         word_to_id = load('word_to_id')
         id_to_label = load('id_to_label')
         makis_collection = load('demo_output_data')
+        pp.pprint(makis_collection)
         makis_start_sec = min(makis_collection['now_sm'].keys())
         path_collection = []
         output_collection = {}
