@@ -117,6 +117,8 @@ def test():
                         # next_label = id_to_label[ordered_collection[path][s]['next_label']]
                         # help_label = id_to_label[ordered_collection[path][s]['help']]
                         sec_id_obj = makis_collection['obj_label'][makis_start_sec + s][0]
+                        for obj_id in sec_id_obj:
+                                print(id_to_word[obj_id])
                         # sec_id_obj = {}
                         # for obj in sec_obj.keys():
                         #         position = word_to_id[obj]
