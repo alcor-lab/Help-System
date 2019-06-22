@@ -5,6 +5,7 @@ import config
 import cv2
 import numpy as np
 import os
+import random
 from tqdm import tqdm
 
 pp = pprint.PrettyPrinter(indent=4)
@@ -23,6 +24,7 @@ def test():
         word_to_id = load('word_to_id')
         id_to_label = load('id_to_label')
         ordered_collection = load('ordered_collection')
+        makis_collection = load('demo_output_data')
         path_collection = []
         output_collection = {}
         for key1 in test_collection.keys():
@@ -119,6 +121,13 @@ def test():
                                 position = word_to_id[obj]
                                 value = sec_obj[obj]
                                 sec_id_obj[position] = value
+                        
+                        for obj_id in sec_obj:
+                                prob = obj[obj_id]
+                                obj_id = random.choice(list(range(0,33)))
+                                sec_obj[obj_id] = prob
+                        sec_id_obj = makis_collection['obj_label'][makis_start_sec + s]
+                        obj_list.append(sec_id_obj)
 
                         obj_list.append(sec_id_obj)
                         if s >= 3:
@@ -219,6 +228,9 @@ def test():
                                 out.write(im)
                         
                         pbar_second.update(1)
+                print('\n')
+                print('prep ', float(correct_now)/(s+1), float(correct_c3d)/(s+1), float(correct_next)/(s+1), float(correct_help)/(s+1))
+
                 pbar_second.refresh()
                 pbar_second.clear()
                 pbar_second.close()
