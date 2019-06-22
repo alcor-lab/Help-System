@@ -71,6 +71,7 @@ def test():
                 place_prob  = 0     
                 now_prob    = 0     
                 next_prob   = 0     
+                c3d_prob   = 0     
                 correct_now = 0
                 correct_c3d = 0
                 correct_next = 0
