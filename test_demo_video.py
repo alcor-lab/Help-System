@@ -25,6 +25,7 @@ def test():
         id_to_label = load('id_to_label')
         ordered_collection = load('ordered_collection')
         makis_collection = load('demo_output_data')
+        makis_start_sec = min(makis_collection['now_sm'].keys())
         path_collection = []
         output_collection = {}
         for key1 in test_collection.keys():
@@ -126,8 +127,8 @@ def test():
                                 prob = obj[obj_id]
                                 obj_id = random.choice(list(range(0,33)))
                                 sec_obj[obj_id] = prob
+                                
                         sec_id_obj = makis_collection['obj_label'][makis_start_sec + s]
-                        obj_list.append(sec_id_obj)
 
                         obj_list.append(sec_id_obj)
                         if s >= 3:
