@@ -29,7 +29,7 @@ class MaskWrapper(NetworkWrapper):
             self.ax = plt.axes()
 
 
-    def visualize(self, ind=1):
+    def visualize(self):
         # for elem in self.output.keys():
         #     print(elem, '--->', self.output[elem])
         # print([self.class_list[x] for x in self.results[1]['class_ids']])
@@ -37,13 +37,16 @@ class MaskWrapper(NetworkWrapper):
         # if self.output_proxy:
         #     pass
 
+        if self.output['debug']:
+            print("NO PERSON")
+            
         objects = ['torch', 'cloth', 'cutter', 'spray_bottle','location']
         for obj in objects:
             if obj in self.output:
                 print('{}: {}'.format(obj,  self.output[obj]))
             else:
                 print('{}: no-object'.format(obj))
-
+        ind = self.display - 1
         if self.display:
             r = self.results[ind]
             visualize.display_instances(self.images[ind], r['rois'], r['masks'], r['class_ids'],

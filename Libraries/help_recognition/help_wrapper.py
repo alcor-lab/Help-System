@@ -8,7 +8,7 @@ import numpy as np
 import cv2
 
 
-def displayResult(images_pack, label, label_help, delay):
+def displayResult(images_pack, label, help_labels, delay):
 
     # TODO the below fors can be vectorised for improved performance
     # TODO remove magic numbers
@@ -23,10 +23,11 @@ def displayResult(images_pack, label, label_help, delay):
                                            round(frame.shape[1] * 0.05)),
                             cv2.FONT_HERSHEY_SIMPLEX,
                             0.6, (0xFF, 0xFF, 0xFF), 1)
-                cv2.putText(frame, label_help, (round(frame.shape[0] * 0.05),
-                                           round(frame.shape[1] * 0.05)+20),
-                            cv2.FONT_HERSHEY_SIMPLEX,
-                            0.6, (0xFF, 0xFF, 0xFF), 1)
+                if help_labels:
+                    cv2.putText(frame, label_help, (round(frame.shape[0] * 0.05),
+                                            round(frame.shape[1] * 0.05)+20),
+                                cv2.FONT_HERSHEY_SIMPLEX,
+                                0.6, (0xFF, 0xFF, 0xFF), 1)
                 cv2.imshow('Recognition results', frame)
                 key = cv2.waitKey(delay) & 0xFF
                 # print("KEY PRESSED", key)
@@ -117,9 +118,11 @@ class HelpWrapper(NetworkWrapper):
             #     publish_string(self.output_proxy, self.help_pred_labels[0])
             
             # frames/activity display
+            # help_labels = ' '.join(self.help_pred_labels)
+            help_labels = None
             if self.display:
                 key = displayResult(self.images_pack, self.y_pred_labels[-1], 
-                                    ' '.join(self.help_pred_labels), delay)
+                                    help_labels, delay)
                 if key == ord('r'):
                     # Press key `r` to reset network
                     print("\n\n---Resetting hidden state---\n\n")

@@ -476,76 +476,74 @@ def check_alternatives2(state_now,pred_h_n,data_act,last_help):
         return poss_dec
 
            
-def verify_poss(last_help,prior_help_w):   
-        poss_dec = []
-        poss_dec2 = []
-        curr_sit = [voc_help_to_num[x] for x in last_help] 
-        curr_sit_P = [voc_help_to_num[x] for x in prior_help_w] 
-        pred_helpX = list(set.difference(getset(curr_sit_P),getset(curr_sit)))
-        if len(pred_helpX) > 1:
-              poss_dec = vocab_help[pred_helpX[0]]
-              poss_dec2 = vocab_help[pred_helpX[1]]
-        else:
-            poss_dec = vocab_help[pred_helpX[0]]
-            poss_dec2 = poss_dec
-        print(pred_helpX)
+def verify_poss(last_help,prior_help_w,dict_trans,vals_loc):  
+    poss_dec =[]
+    poss_dec2 =[]
+    ## Technician is under diverter
+    curr_sit = [voc_help_to_num[x] for x in last_help] 
+    curr_sit_P = [voc_help_to_num[x] for x in prior_help_w] 
+    not_done = list(set.difference(getset(vals_loc),getset(curr_sit)))
+    dict_keys = [k for k  in dict_trans.keys()]
+    dict_vals = [vals for vals in dict_trans.values()]
+    poss_to_do = list(set.intersection(getset(not_done),getset(dict_keys)))
+    if is_empty(poss_to_do):
         return poss_dec, poss_dec2
+    elif len(poss_to_do)==1:
+        poss_dec = vocab_help[poss_to_do[0]]
+        poss_dec2 = vocab_help[poss_to_do[0]]
+    else:
+        
+        idx = np.argmax(poss_to_do)
+        poss_dec = vocab_help[poss_to_do[idx] ]
+        idx2 = list(set.difference(getset(poss_to_do),getset(poss_to_do[idx])))
+        poss_dec2 = vocab_help[poss_to_do[idx2[0]] ]
+        
+    print('we have chosen for under_diverter', poss_dec, 'and',poss_dec2)
+    return poss_dec, poss_dec2
         
         
-def check_alternatives3(state_now,k_location,last_help,prior_help_w, current_help):
+def check_alternatives_locations(state_now,k_location,last_help,prior_help_w, current_help,dict_trans):
     print('alternative 3')
     poss_help = []
     poss_dec = []
     poss_dec2 = []
     if k_location != 'unknown':############# changed
-           print("k_location know", k_location)
+       print("k_location know", k_location)
+       "Case 0: no_person"
+       if k_location == 'no_person':
+            poss_help =  'nah'
+            poss_help2 = 'nah'
+       else:    
            loc = consist_loc[k_location]
            vals_loc = list(set.difference(getset(np.arange(0,8)),getset(loc)))
-           if len(vals_loc) > 1:
-               "only one of them"
-               if vocab_help[2] not in last_help:
-                       poss_help = vocab_help[vals_loc[0]]
-                       poss_help2 = vocab_help[2]
-               elif vocab_help[2] in last_help:
-                       poss_help = vocab_help[vals_loc[1]]
-                       poss_help2 = vocab_help[3]
-           if len(vals_loc) == 1:   
+           "cose1. diff =1 & 4"
+           if len(vals_loc) == 1:   #At Guard_SUpport
               if vocab_help[7] == current_help and k_location == 'at_guard_support':
-                poss_help =  'nah'
-                poss_help2 = 'nah'
+                     "at_guard becasue passing"
+                     poss_dec = 'nah'
+                     poss_dec2 = 'nah' 
               elif vocab_help[7] != current_help and k_location == 'at_guard_support':
-                poss_help = vocab_help[vals_loc[0]]
-                poss_help2 = vocab_help[0]
-    if not(is_empty(poss_help)):
-        if poss_help == 'nah' and poss_help2 == 'nah':
-            poss_dec = poss_help
-            poss_dec2 = poss_help
-        if set.issubset(getset(poss_help),getset(last_help)):
-           verify_poss(last_help,prior_help_w)
-        else: 
-            poss_dec = poss_help
-            poss_dec2 = poss_help2
-    if k_location == 'unknown' and is_empty(poss_help):
-        ##case torch
-        if state_now == 'torch':
-           if vocab_help[0] in last_help and vocab_help[5] not in last_help:
-               poss_dec = vocab_help[5]
-               poss_dec2 = vocab_help[5]
-           elif vocab_help[0] in last_help and vocab_help[5] in last_help:
-               poss_dec, poss_dec2= verify_poss(last_help,prior_help_w)
-           elif vocab_help[0] not in last_help: ##error    
-              poss_dec, poss_dec2= verify_poss(last_help,prior_help_w)
-        #case cloth
-        if state_now == 'cloth':
-           if vocab_help[6] in last_help and vocab_help[7] in last_help and vocab_help[5] in last_help\
-              and vocab_help[1] not in last_help:
-               poss_dec = vocab_help[1]
-               poss_dec2 = vocab_help[1]
-           if vocab_help[6] not in last_help:  #error
-              poss_dec, poss_dec2= verify_poss(last_help,prior_help_w)
-    if poss_help == []:
-        "unknown location unknown holding"
-        poss_dec, poss_dec2= verify_poss(last_help,prior_help_w)
+                poss_dec = vocab_help[4]
+                poss_dec2 = vocab_help[4]
+                
+           if len(vals_loc) > 1 and len(vals_loc) < 3: ##At Ladder
+               "case 2 diff =2 &2"
+               if vocab_help[3] not in last_help and vocab_help[2] not in last_help:
+                       poss_dec = vocab_help[2]
+                       poss_dec2 = vocab_help[2]
+               if vocab_help[3] not in last_help and vocab_help[2] in last_help:
+                       poss_dec = vocab_help[3]
+                       poss_dec2 = vocab_help[3]
+               elif vocab_help[2] in last_help and vocab_help[3] in last_help and vocab_help[7] not in last_help:
+                       poss_dec = vocab_help[7]
+                       poss_dec2 = vocab_help[7]
+           if len(vals_loc) > 1 and len(vals_loc) >= 3: ##under_diverter
+                poss_dec,poss_dec2 = verify_poss(last_help,prior_help_w,dict_trans,vals_loc)
+    
+    if k_location == 'unknown' and is_empty(poss_dec):
+        print('unknown location', k_location)
+        poss_dec = []
+        poss_dec2 = []
     return poss_dec, poss_dec2
     
 
@@ -675,9 +673,19 @@ def compute_help(help_answer_stack,now_softmax,help_softmax,obj_state,where_is, 
         "then exit with help_net_predicted"
         
         preds_h_n = np.where(help_trans[num_h,:]>0)[0]
-        best_vals =(-help_trans[num_h,:]).argsort()[:2] 
-        preds_vals = [help_trans[num_h,int(x)] for x in preds_h_n]
-        prior_help_w = get_names(preds_h_n,vocab_help)
+        
+        best_vals =(-help_trans[num_h,:]).argsort()[:3] 
+        vals = [help_trans[num_h,ii] for ii in best_vals]
+        idx = [ii for ii, x in  enumerate(vals) if x > 0.0]
+        best_vals_new = []
+        vals_new = []
+        for nn in range(len(idx)):
+            best_vals_new.append(best_vals[idx[nn]])
+            vals_new.append(vals[idx[nn]])
+        
+        
+        dict_trans = dict(zip(best_vals_new,vals_new))
+        prior_help_w = get_names(best_vals_new,vocab_help)    # is a list
         
         
         done_trans = list(set.difference(getset(prior_help_w),getset(last_help)))
@@ -698,7 +706,7 @@ def compute_help(help_answer_stack,now_softmax,help_softmax,obj_state,where_is, 
         
             
         if is_empty(poss_dec1):    
-           poss_dec1,poss_dec2 = check_alternatives3(state_now,at_location,last_help,prior_help_w,curr_help)
+           poss_dec1,poss_dec2 = check_alternatives_locations(state_now,at_location,last_help,prior_help_w,curr_help,dict_trans)
            if is_empty(poss_dec1):
                poss_dec1 = 'nah'
                poss_dec2 ='nah'

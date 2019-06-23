@@ -117,8 +117,10 @@ class MaskSH:
         diverter_index = self.class_list.index('diverter')
         ladder_index = self.class_list.index('ladder')
         
+        output['debug'] = None
         if person_index not in class_ids.tolist():
             output['location'] = "no_technician"
+            output['debug'] = "no_person_at_all"
         if diverter_index not in class_ids.tolist():
             output['location'] = "no_diverter"
         
@@ -131,7 +133,6 @@ class MaskSH:
             imageHSVflat = np.reshape(np.array(imagePilHSV), (-1,3))
             # print("HSV:",time.monotonic() - start)
             technician_id = -1
-            print(len(person_indices))
             for p_elem in person_indices:
                 maschera = masks[p_elem, :, :].flatten()
                 #aux_zero = np.zeros(imageHSV.shape)
@@ -139,30 +140,9 @@ class MaskSH:
                 h = valid_pixels[:,0]
                 s = valid_pixels[:,1]
                 v = valid_pixels[:,2]
-                cond = (s>204) * (((h > 0) * (h<76)) + ((h>200) * (h<255))) * (v > 125)
+                cond = (s>204) * (((h > 0) * (h<76)) + ((h>200) * (h<255))) * (v > 80)
                 remaining_pixel = np.sum(cond)
                 tot_pixel = np.sum(maschera, axis=None)# len(np.where(maschera==True))
-                # for x in range(maschera.shape[0]):
-                #     for y in range(maschera.shape[1]):
-                #         if maschera[x,y] == True:
-                #             tot_pixel +=1
-                #             h= imageHSV[x,y,0]
-                #             s= imageHSV[x,y,1]
-                #             v= imageHSV[x,y,2]
-                #             if s>0.8*255:
-                #                 if (h>0 and h<76) or (h>200 and h<255):
-                #                     if v > 125:
-                #                         remaining_pixel += 1
-                #                         #aux_zero[x,y,:] = images[1][x,y,:]
-                                     
-                #             #         else:
-                #             #             aux_zero[x,y,:] = (0,0,0)
-                                            
-                #             #     else:
-                #             #         aux_zero[x,y,:] = (0,0,0)
-                #             # else:
-                # #             #     aux_zero[x,y,:] = (0,0,0)
-                # print("FOR PERSON:", time.monotonic() - start)
                 fraction_jumper = remaining_pixel/tot_pixel
                 if fraction_jumper > 0.08:
                     technician_id = p_elem
@@ -171,22 +151,6 @@ class MaskSH:
             else:
                 output['location'] = self.wheresWaldo(result[1], self.class_list, technician_id)
             # print("EDOARDO'S CODE:", time.monotonic()-start)
-        '''
-        elif class_ids.tolist().count(person_index) == 1:
-            index = class_ids.tolist().index(person_index)
-            output['location'] = self.wheresWaldo(result[1], self.class_list, index)
-        elif class_ids.tolist().count(person_index) > 1:
-            person_indices = self.where_index(class_ids.tolist(), person_index)
-            locations = []
-            right_location = 'unsure_location'
-            valid_locations = ["Technician on the Ladder",  "Technician next to Guard"]
-            for index in person_indices:
-                locations.append(self.wheresWaldo(result[1], self.class_list, index))
-            for location in locations:
-                if location in valid_locations:
-                    right_location = location
-            output['location'] = location
-        '''
-
+    
         return output, result
     
