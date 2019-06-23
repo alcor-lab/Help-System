@@ -1,9 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Sat Jun  8 13:40:29 2019
-
-@author: fiora
-"""
 
 import numpy as np 
 import numpy.matlib
@@ -490,12 +485,12 @@ def check_alternatives3(state_now,k_location,last_help,prior_help_w, current_hel
            vals_loc = list(set.difference(getset(np.arange(0,8)),getset(loc)))
            if len(vals_loc) > 1:
                "only one of them"
-               if is_empty(state_now):
+               if vocab_help[2] not in last_help:
                        poss_help = vocab_help[vals_loc[0]]
-                       poss_help2 = vocab_help[vals_loc[1]]
-               else:
+                       poss_help2 = vocab_help[2]
+               elif vocab_help[2] in last_help:
                        poss_help = vocab_help[vals_loc[1]]
-                       poss_help2 = vocab_help[vals_loc[0]]
+                       poss_help2 = vocab_help[3]
            if len(vals_loc) == 1:   
               if vocab_help[7] == current_help and k_location == 'at_guard_support':
                 poss_help =  'nah'
@@ -514,20 +509,37 @@ def check_alternatives3(state_now,k_location,last_help,prior_help_w, current_hel
             poss_dec = poss_help
             poss_dec2 = poss_help2
     if k_location == 'unknown' and is_empty(poss_help):
+        ##case torch
         if state_now == 'torch':
-           if vocab_help[0] in last_help:
+           if vocab_help[0] in last_help and vocab_help[5] not in last_help:
                poss_dec = vocab_help[5]
-               poss_dec2 = vocab_help[4]
-           else: poss_help =[]
-        if state_now == 'cloth':
-           if vocab_help[6] in last_help:
-               poss_dec = vocab_help[1]
                poss_dec2 = vocab_help[5]
-           else: poss_help =[]
+           elif vocab_help[0] in last_help and vocab_help[5] in last_help:
+               poss_dec ='nah'
+               poss_dec2 ='nah'
+           elif vocab_help[0] not in last_help: ##error    
+              if vocab_help[7] not in last_help and vocab_help[3] in last_help:
+                 poss_dec = vocab_help[7]
+                 poss_dec2 = vocab_help[7]
+              else: 
+                  poss_dec ='nah'
+                  poss_dec2 ='nah'
+        #case cloth
+        if state_now == 'cloth':
+           if vocab_help[6] in last_help and vocab_help[7] in last_help and vocab_help[5] in last_help\
+              and vocab_help[1] not in last_help:
+               poss_dec == vocab_help[1]
+               poss_dec2 = vocab_help[1]
+           if vocab_help[6] not in last_help:  #error
+              poss_dec = 'nah'
+              poss_dec2 = 'nah'
     if poss_help == []:
-        poss_dec = vocab_help[0]
-        poss_dec2 = vocab_help[4]
+        "unknown location unknown holding"
+        
+        poss_dec = 'nah'
+        poss_dec2 = 'nah'
     return poss_dec, poss_dec2
+           
 
 def choose_poss_help(cc,last_help,state_now):
     poss_help = []
