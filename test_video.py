@@ -23,11 +23,6 @@ def test():
         word_to_id = load('word_to_id')
         id_to_label = load('id_to_label')
         makis_collection = load('demo_output_data')
-        pp.pprint(makis_collection['obj_label'])
-        for sec in makis_collection['obj_label']:
-                print(sec)
-                for el in makis_collection['obj_label'][sec]:
-                        print(el)
         makis_start_sec = min(makis_collection['now_sm'].keys())
         path_collection = []
         output_collection = {}
@@ -180,9 +175,9 @@ def test():
                                 # if help_label == help_word:
                                 #         correct_help += 1
 
-                                # print('\n')
+                                print('\n')
                                 # print(' ', now_target, now_target, next_label, help_label)
-                                # print(' ', now_word, c3d_word, next_word, action, obj, place)
+                                print(' ', now_word, c3d_word, next_word, action, obj, place)
                                 # print('prep ', float(correct_now)/(s+1), float(correct_c3d)/(s+1), float(correct_next)/(s+1), float(correct_help)/(s+1))
                         
                         for frame in range(s*fps+1, (s+1)*fps+1):
@@ -190,16 +185,16 @@ def test():
                                 ret, im = video.read()
                                 im = cv2.resize(im, dsize=(out_width, out_height), interpolation=cv2.INTER_CUBIC)
 
-                                thickness = 3
-                                font_scale = 3
+                                thickness = 2
+                                font_scale = 2
 
-                                # color = BLUE_COLOR
-                                # text = 'Help: ' + action + ' ' + str(action_prob) 
-                                # cv2.putText(im, text ,(10,20),1,font_scale,color,thickness, bottomLeftOrigin=False)
-                                # text = 'Help: '+ obj + ' ' + str(obj_prob)
-                                # cv2.putText(im, text ,(10,50),1,font_scale,color,thickness, bottomLeftOrigin=False)
-                                # text = 'Help: ' + place + ' ' + str(place_prob) 
-                                # cv2.putText(im, text ,(10,80),1,font_scale,color,thickness, bottomLeftOrigin=False)
+                                color = BLUE_COLOR
+                                text = 'Help: ' + action + ' ' + str(action_prob) 
+                                cv2.putText(im, text ,(10,20),1,font_scale,color,thickness, bottomLeftOrigin=False)
+                                text = 'Help: '+ obj + ' ' + str(obj_prob)
+                                cv2.putText(im, text ,(10,50),1,font_scale,color,thickness, bottomLeftOrigin=False)
+                                text = 'Help: ' + place + ' ' + str(place_prob) 
+                                cv2.putText(im, text ,(10,80),1,font_scale,color,thickness, bottomLeftOrigin=False)
                                 
                                 if now_word == now_target:
                                         color = GREEN_COLOR
@@ -208,13 +203,13 @@ def test():
                                 text = 'Now: ' + now_word + ' ' + str(now_prob) 
                                 cv2.putText(im, text ,(10,110),1,font_scale,color,thickness, bottomLeftOrigin=False)
 
-                                # color = BLUE_COLOR
-                                # text = 'Next: ' + next_word + ' ' + str(next_prob)
-                                # cv2.putText(im, text ,(10,140),1,font_scale,color,thickness, bottomLeftOrigin=False)
-
                                 color = BLUE_COLOR
-                                text = 'Live Now: ' + now_target + ' ' + str(now_target_prob) 
-                                cv2.putText(im, text ,(10,170),1,font_scale,color,thickness, bottomLeftOrigin=False)
+                                text = 'Next: ' + next_word + ' ' + str(next_prob)
+                                cv2.putText(im, text ,(10,140),1,font_scale,color,thickness, bottomLeftOrigin=False)
+
+                                # color = BLUE_COLOR
+                                # text = 'Live Now: ' + now_target + ' ' + str(now_target_prob) 
+                                # cv2.putText(im, text ,(10,170),1,font_scale,color,thickness, bottomLeftOrigin=False)
                                 color = BLUE_COLOR
                                 text = 'c3d_word Now: ' + c3d_word + ' ' + str(c3d_prob) 
                                 cv2.putText(im, text ,(10,200),1,font_scale,color,thickness, bottomLeftOrigin=False)
