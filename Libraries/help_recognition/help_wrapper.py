@@ -8,7 +8,7 @@ import numpy as np
 import cv2
 
 
-def displayResult(images_pack, label, delay):
+def displayResult(images_pack, label, label_help, delay):
 
     # TODO the below fors can be vectorised for improved performance
     # TODO remove magic numbers
@@ -21,6 +21,10 @@ def displayResult(images_pack, label, delay):
                 # # of image, standard thickness (1)
                 cv2.putText(frame, label, (round(frame.shape[0] * 0.05),
                                            round(frame.shape[1] * 0.05)),
+                            cv2.FONT_HERSHEY_SIMPLEX,
+                            0.6, (0xFF, 0xFF, 0xFF), 1)
+                cv2.putText(frame, label_help, (round(frame.shape[0] * 0.05),
+                                           round(frame.shape[1] * 0.05)+20),
                             cv2.FONT_HERSHEY_SIMPLEX,
                             0.6, (0xFF, 0xFF, 0xFF), 1)
                 cv2.imshow('Recognition results', frame)
@@ -114,7 +118,8 @@ class HelpWrapper(NetworkWrapper):
             
             # frames/activity display
             if self.display:
-                key = displayResult(self.images_pack, self.y_pred_labels[-1], delay)
+                key = displayResult(self.images_pack, self.y_pred_labels[-1], 
+                                    ' '.join(self.help_pred_labels), delay)
                 if key == ord('r'):
                     # Press key `r` to reset network
                     print("\n\n---Resetting hidden state---\n\n")

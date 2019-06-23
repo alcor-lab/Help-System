@@ -6,10 +6,13 @@ import numpy as np
 import skimage.io
 import matplotlib
 import matplotlib.pyplot as plt
+from PIL import Image as pi
 from tf_mask_rcnn import utils
 import tf_mask_rcnn.model as modellib
 import tf_mask_rcnn.coco as coco
 import tensorflow as tf
+
+import time
 
 CLASSES = ['BG','spray_bottle', 'screwdriver', 'torch', 'cloth', 'cutter', 
                             'pliers', 'brush', 'torch_handle', 'guard', 'ladder', 'closed_ladder', 
@@ -76,18 +79,18 @@ class MaskSH:
             ladder_person = ladder_bb + mask_person
             s_l_p = len(np.where(ladder_person>100)[0]) * 100
             if s_l_p > 1 and s_d_p >15:
-                return "Technician on the Ladder"
+                return "on_the_ladder"
         if s_d_p > 15 and s_ed_p > 70:
-            return "Technician on the Ladder"
+            return "on_the_ladder"
         if s_ed_p < 15:
-            return "Technician next to Guard"
+            return "at_guard_support"
         '''
         if s_d_p < 15 and s_ed_p > 70:
             return "unsure_location"
         else:
             return [s_ed_p, s_d_p, s_l_p]
         '''
-        return 'The Location is NOT sure (maybe under_diverter case)'
+        return 'under_diverter'
 
     def where_index(self, list_to_inspect, element):
         ret = []
@@ -115,9 +118,60 @@ class MaskSH:
         ladder_index = self.class_list.index('ladder')
         
         if person_index not in class_ids.tolist():
-            output['location'] = "No person"
-        elif diverter_index not in class_ids.tolist():
-            output['location'] = "No diverter"
+            output['location'] = "no_technician"
+        if diverter_index not in class_ids.tolist():
+            output['location'] = "no_diverter"
+        
+        elif class_ids.tolist().count(person_index) >= 1:
+            # start = time.monotonic()
+            person_indices = self.where_index(class_ids.tolist(), person_index)
+            masks = r['masks']
+            masks = np.transpose(masks, (2,0,1))
+            imagePilHSV = pi.fromarray(images[1]).convert('HSV')
+            imageHSVflat = np.reshape(np.array(imagePilHSV), (-1,3))
+            # print("HSV:",time.monotonic() - start)
+            technician_id = -1
+            print(len(person_indices))
+            for p_elem in person_indices:
+                maschera = masks[p_elem, :, :].flatten()
+                #aux_zero = np.zeros(imageHSV.shape)
+                valid_pixels = imageHSVflat[maschera,...]
+                h = valid_pixels[:,0]
+                s = valid_pixels[:,1]
+                v = valid_pixels[:,2]
+                cond = (s>204) * (((h > 0) * (h<76)) + ((h>200) * (h<255))) * (v > 125)
+                remaining_pixel = np.sum(cond)
+                tot_pixel = np.sum(maschera, axis=None)# len(np.where(maschera==True))
+                # for x in range(maschera.shape[0]):
+                #     for y in range(maschera.shape[1]):
+                #         if maschera[x,y] == True:
+                #             tot_pixel +=1
+                #             h= imageHSV[x,y,0]
+                #             s= imageHSV[x,y,1]
+                #             v= imageHSV[x,y,2]
+                #             if s>0.8*255:
+                #                 if (h>0 and h<76) or (h>200 and h<255):
+                #                     if v > 125:
+                #                         remaining_pixel += 1
+                #                         #aux_zero[x,y,:] = images[1][x,y,:]
+                                     
+                #             #         else:
+                #             #             aux_zero[x,y,:] = (0,0,0)
+                                            
+                #             #     else:
+                #             #         aux_zero[x,y,:] = (0,0,0)
+                #             # else:
+                # #             #     aux_zero[x,y,:] = (0,0,0)
+                # print("FOR PERSON:", time.monotonic() - start)
+                fraction_jumper = remaining_pixel/tot_pixel
+                if fraction_jumper > 0.08:
+                    technician_id = p_elem
+            if technician_id == -1:
+                output['location'] = 'no_technician'
+            else:
+                output['location'] = self.wheresWaldo(result[1], self.class_list, technician_id)
+            # print("EDOARDO'S CODE:", time.monotonic()-start)
+        '''
         elif class_ids.tolist().count(person_index) == 1:
             index = class_ids.tolist().index(person_index)
             output['location'] = self.wheresWaldo(result[1], self.class_list, index)
@@ -132,6 +186,7 @@ class MaskSH:
                 if location in valid_locations:
                     right_location = location
             output['location'] = location
+        '''
 
         return output, result
     

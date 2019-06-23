@@ -476,9 +476,27 @@ def check_alternatives2(state_now,pred_h_n,data_act,last_help):
         return poss_dec
 
            
+def verify_poss(last_help,prior_help_w):   
+        poss_dec = []
+        poss_dec2 = []
+        curr_sit = [voc_help_to_num[x] for x in last_help] 
+        curr_sit_P = [voc_help_to_num[x] for x in prior_help_w] 
+        pred_helpX = list(set.difference(getset(curr_sit_P),getset(curr_sit)))
+        if len(pred_helpX) > 1:
+              poss_dec = vocab_help[pred_helpX[0]]
+              poss_dec2 = vocab_help[pred_helpX[1]]
+        else:
+            poss_dec = vocab_help[pred_helpX[0]]
+            poss_dec2 = poss_dec
+        print(pred_helpX)
+        return poss_dec, poss_dec2
+        
+        
 def check_alternatives3(state_now,k_location,last_help,prior_help_w, current_help):
     print('alternative 3')
     poss_help = []
+    poss_dec = []
+    poss_dec2 = []
     if k_location != 'unknown':############# changed
            print("k_location know", k_location)
            loc = consist_loc[k_location]
@@ -503,8 +521,7 @@ def check_alternatives3(state_now,k_location,last_help,prior_help_w, current_hel
             poss_dec = poss_help
             poss_dec2 = poss_help
         if set.issubset(getset(poss_help),getset(last_help)):
-           poss_dec ='nah'
-           poss_dec2 = 'nah'
+           verify_poss(last_help,prior_help_w)
         else: 
             poss_dec = poss_help
             poss_dec2 = poss_help2
@@ -515,31 +532,22 @@ def check_alternatives3(state_now,k_location,last_help,prior_help_w, current_hel
                poss_dec = vocab_help[5]
                poss_dec2 = vocab_help[5]
            elif vocab_help[0] in last_help and vocab_help[5] in last_help:
-               poss_dec ='nah'
-               poss_dec2 ='nah'
+               poss_dec, poss_dec2= verify_poss(last_help,prior_help_w)
            elif vocab_help[0] not in last_help: ##error    
-              if vocab_help[7] not in last_help and vocab_help[3] in last_help:
-                 poss_dec = vocab_help[7]
-                 poss_dec2 = vocab_help[7]
-              else: 
-                  poss_dec ='nah'
-                  poss_dec2 ='nah'
+              poss_dec, poss_dec2= verify_poss(last_help,prior_help_w)
         #case cloth
         if state_now == 'cloth':
            if vocab_help[6] in last_help and vocab_help[7] in last_help and vocab_help[5] in last_help\
               and vocab_help[1] not in last_help:
-               poss_dec == vocab_help[1]
+               poss_dec = vocab_help[1]
                poss_dec2 = vocab_help[1]
            if vocab_help[6] not in last_help:  #error
-              poss_dec = 'nah'
-              poss_dec2 = 'nah'
+              poss_dec, poss_dec2= verify_poss(last_help,prior_help_w)
     if poss_help == []:
         "unknown location unknown holding"
-        
-        poss_dec = 'nah'
-        poss_dec2 = 'nah'
+        poss_dec, poss_dec2= verify_poss(last_help,prior_help_w)
     return poss_dec, poss_dec2
-           
+    
 
 def choose_poss_help(cc,last_help,state_now):
     poss_help = []

@@ -212,8 +212,8 @@ class ActivityNetwork:
         if retrieve_id in self.hidden_states_collection.keys():
             c[0, :, :, :] = self.hidden_states_collection[retrieve_id]['c']
             h[0, :, :, :] = self.hidden_states_collection[retrieve_id]['h']
-        else:
-            print('\nATTENTION: hiddend state not found')
+        # else:
+        #     print('\nATTENTION: hiddend state not found')
         return c, h
 
     def save_hidden_state(self, second_id, c, h):
