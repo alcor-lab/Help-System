@@ -137,7 +137,7 @@ def recompose_list_into_help(net_predicted_help_L):
         x = vocab_help[jj].split()
         val = set.intersection(getset(net_predicted_help_L),getset(x))
         if getset(val) == getset(net_predicted_help_L):
-            print(vocab_help[jj])
+            # print(vocab_help[jj])
             found_corr =  vocab_help[jj]
     return found_corr
 
@@ -503,7 +503,7 @@ def verify_poss(last_help,prior_help_w,dict_trans,vals_loc):
         
         
 def check_alternatives_locations(state_now,k_location,last_help,prior_help_w, current_help,dict_trans):
-    print('alternative 3')
+    # print('alternative 3')
     poss_help = []
     poss_dec = []
     poss_dec2 = []
@@ -518,13 +518,17 @@ def check_alternatives_locations(state_now,k_location,last_help,prior_help_w, cu
            vals_loc = list(set.difference(getset(np.arange(0,8)),getset(loc)))
            "cose1. diff =1 & 4"
            if len(vals_loc) == 1:   #At Guard_SUpport
-              if vocab_help[7] == current_help and k_location == 'at_guard_support':
-                     "at_guard becasue passing"
-                     poss_dec = 'nah'
-                     poss_dec2 = 'nah' 
-              elif vocab_help[7] != current_help and k_location == 'at_guard_support':
-                poss_dec = vocab_help[4]
-                poss_dec2 = vocab_help[4]
+            #   if vocab_help[7] == current_help and k_location == 'at_guard_support':
+            #          "at_guard becasue passing"
+            #          poss_dec = 'nah'
+            #          poss_dec2 = 'nah' 
+              if k_location == 'at_guard_support':
+                  if type(vals_loc) == list:
+                    poss_dec = vocab_help[vals_loc[0]]
+                    poss_dec2 = vocab_help[vals_loc[0]]
+                  else:
+                    poss_dec = vocab_help[vals_loc]
+                    poss_dec2 = vocab_help[vals_loc]
                 
            if len(vals_loc) > 1 and len(vals_loc) < 3: ##At Ladder
                "case 2 diff =2 &2"

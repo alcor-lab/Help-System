@@ -11,7 +11,7 @@ import os
 "    Transition matrices "
 PKL_PATH = os.path.dirname(os.path.abspath(__file__))
 
-with open(os.path.join(PKL_PATH, 'help_trans_p.pkl'), 'rb') as fp:
+with open(os.path.join(PKL_PATH, 'help_trans.pkl'), 'rb') as fp:
     help_trans = pickle.load(fp) 
     
     

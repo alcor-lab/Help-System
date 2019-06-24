@@ -1,8 +1,27 @@
 get:
   _:
     - install_clang: '3.9'
+    - apt_install: software-properties-common
+    - add_apt_repository:
+        repository: multiverse
+        ppa: False
+    - apt_update
+    - apt_install:
+      - python
+      - python-dev
+      - python3-dev
+      - python-setuptools
     - apt_install: libstdc++-6-dev
     - apt_install: python3-pil.imagetk
+    - apt_install:
+      - build-essential
+      - wget
+      - nano
+      - rsync
+      - unzip
+      - curl
+      - python-software-properties
+    - sudo dpkg --configure -a
     - pip3_install:
         packages: pip
         upgrade: True
