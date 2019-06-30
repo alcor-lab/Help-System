@@ -9,7 +9,6 @@ import numpy as np
 
 from PIL import Image
 
-
 class MaskWrapper(NetworkWrapper):
     def __init__(self, *args, **kwargs):
         super(MaskWrapper, self).__init__(*args, **kwargs)

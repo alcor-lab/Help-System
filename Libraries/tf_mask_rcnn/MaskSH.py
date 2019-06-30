@@ -14,9 +14,54 @@ import tensorflow as tf
 
 import time
 
+import cv2
+
+from sklearn.externals import joblib
+
 CLASSES = ['BG','spray_bottle', 'screwdriver', 'torch', 'cloth', 'cutter', 
                             'pliers', 'brush', 'torch_handle', 'guard', 'ladder', 'closed_ladder', 
                                 'guard-support', 'robot', 'technician', 'diverter' ]
+
+
+MU_MULT=3.5
+PIXEL_THRESHOLD = 200
+
+PKL_PATH = os.path.dirname(os.path.abspath(__file__))
+
+def createTestImageNp(imV):
+    pixelList = []
+    im = pi.fromarray(imV)
+    imHSV = im.convert('HSV')
+    imHsvV = np.array(imHSV)
+    
+    reshapeDim = imV.shape[0] * imV.shape[1]
+    imV = np.reshape(imV, (reshapeDim, 3))
+    imHsvV = np.reshape(imHsvV, (reshapeDim, 3))
+    data = np.concatenate((imV, imHsvV), axis=1)
+    
+    return data
+
+def point_count(frame, model):
+    testImageV = np.array(frame)
+    #testImageV = testImageV[...,::-1]
+    testImageShape = testImageV.shape[:2]
+    # start = time.monotonic()
+    processedImage = createTestImageNp(testImageV)
+    # print("1", time.monotonic()-start)
+    output = np.exp(model.score_samples(processedImage))
+    # print("2", time.monotonic()-start)
+    output1 = np.divide(output, np.max(output))
+    
+    mu = np.mean(output1)
+    mask_gmm  = output1>MU_MULT*mu
+    # indexTT = np.where(output1>3.5*mu)
+#    auxImm = np.zeros((480*640))
+#
+#    auxImm[indexTT] = 1
+#    auxImm2 = np.reshape(auxImm, (480,640))
+#    idx = np.where(auxImm2==1)
+    return mask_gmm #indexTT
+
 
 class InferenceConfig(coco.CocoConfig):
     GPU_COUNT = 1
@@ -30,6 +75,11 @@ class MaskSH:
             self.sess = tf.Session()
         else:
             self.sess = sess
+
+        
+        self.gmm_model = None
+        with open(os.path.join(PKL_PATH, 'saved_model_technician.pkl'),'rb') as f:
+            self.gmm_model = joblib.load(f)
 
         self.shape = (1080, int(1080*4/3))
         self.class_list = CLASSES   
@@ -125,27 +175,40 @@ class MaskSH:
             output['location'] = "no_diverter"
         
         elif class_ids.tolist().count(person_index) >= 1:
-            # start = time.monotonic()
+            start = time.monotonic()
             person_indices = self.where_index(class_ids.tolist(), person_index)
             masks = r['masks']
             masks = np.transpose(masks, (2,0,1))
-            imagePilHSV = pi.fromarray(images[1]).convert('HSV')
-            imageHSVflat = np.reshape(np.array(imagePilHSV), (-1,3))
-            # print("HSV:",time.monotonic() - start)
+            # imagePilHSV = pi.fromarray(images[1]).convert('HSV')
+            # imageHSVflat = np.reshape(np.array(imagePilHSV), (-1,3))
+            shape_gmm = (240,320)
+            frame = np.array(pi.fromarray(images[1]).resize(shape_gmm, resample=pi.BILINEAR))
+            jacket_mask = point_count(frame, self.gmm_model)
+            # jacket_mask_res =  np.array(np.reshape(jacket_mask, shape_gmm[::-1])*255).astype(np.uint8)
+            # cv2.imshow('test gmm', jacket_mask_res)
+            # cv2.waitKey(200)
+            # print("TIME GMM:", time.monotonic() - start)
             technician_id = -1
             for p_elem in person_indices:
-                maschera = masks[p_elem, :, :].flatten()
-                #aux_zero = np.zeros(imageHSV.shape)
-                valid_pixels = imageHSVflat[maschera,...]
-                h = valid_pixels[:,0]
-                s = valid_pixels[:,1]
-                v = valid_pixels[:,2]
-                cond = (s>204) * (((h > 0) * (h<76)) + ((h>200) * (h<255))) * (v > 80)
-                remaining_pixel = np.sum(cond)
-                tot_pixel = np.sum(maschera, axis=None)# len(np.where(maschera==True))
-                fraction_jumper = remaining_pixel/tot_pixel
-                if fraction_jumper > 0.08:
+                person_mask = 1.0 * masks[p_elem, :, :]
+                person_mask = np.array(pi.fromarray(person_mask).resize(shape_gmm, resample=pi.NEAREST))
+                # person_mask =  np.reshape(person_mask, (480,640))
+                person_mask = person_mask.flatten()
+                num_pixels = np.sum(person_mask * jacket_mask, axis=-1)
+                if num_pixels > PIXEL_THRESHOLD:
                     technician_id = p_elem
+                # maschera = masks[p_elem, :, :].flatten()
+                # #aux_zero = np.zeros(imageHSV.shape)
+                # valid_pixels = imageHSVflat[maschera,...]
+                # h = valid_pixels[:,0]
+                # s = valid_pixels[:,1]
+                # v = valid_pixels[:,2]
+                # cond = (s>204) * (((h > 0) * (h<76)) + ((h>200) * (h<255))) * (v > 80)
+                # remaining_pixel = np.sum(cond)
+                # tot_pixel = np.sum(maschera, axis=None)# len(np.where(maschera==True))
+                # fraction_jumper = remaining_pixel/tot_pixel
+                # if fraction_jumper > 0.08:
+                #     technician_id = p_elem
             if technician_id == -1:
                 output['location'] = 'no_technician'
             else:
